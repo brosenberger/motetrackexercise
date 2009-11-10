@@ -9,17 +9,21 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Observable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author bensch
  *
  */
 public class ServerReader extends Observable implements Runnable {
-	private String srv;
-	private int port;
-	private boolean run;
+	private final String srv;
+	private final int port;
+	private volatile boolean run;
+        private Socket client;
+        private BufferedReader reader;
 	
-	public ServerReader(String srv, int port) {
+	public ServerReader(final String srv, final int port) {
 		this.srv = srv;
 		this.port = port;
 		this.run = true;
@@ -29,6 +33,10 @@ public class ServerReader extends Observable implements Runnable {
 		Thread t = new Thread(this);
 		t.start();
 	}
+
+        public void stopReader() {
+            run = false;
+        }
 	
 	protected void updateObserver(String msg) {
 		this.setChanged();
@@ -39,22 +47,41 @@ public class ServerReader extends Observable implements Runnable {
 	 */
 	@Override
 	public void run() {
-		Socket client;
-		BufferedReader reader;
 		
 		try {
 			client = new Socket(this.srv, this.port);
 			reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
-			while (run) {
-				updateObserver(reader.readLine());
+                        String line = "";
+                        
+			while (run && line != null) {
+				updateObserver((line = reader.readLine()));
 			}
-			client.close();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		} finally {
+                    closeConnection();
+                }
 	}
+
+        private void closeConnection() {
+            if (client != null) {
+                try {
+                    client.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(ServerReader.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(ServerReader.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
 }
