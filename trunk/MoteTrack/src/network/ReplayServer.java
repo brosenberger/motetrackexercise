@@ -63,12 +63,7 @@ public class ReplayServer{
                 while (true && !out.checkError()) {
                     while ((read = reader.readLine()) != null && !out.checkError()) {
                         out.println(read);
-                        try {
-                            wait(this.rate);
-                        } catch (IllegalMonitorStateException e) {
-                            // wird bei mir staendig geworfen - thomas
-//                                System.err.println("Thread is not owner of monitor");
-                        }
+                        Thread.sleep(rate);
                     }
                     reader.close();
                     reader = new BufferedReader(new FileReader(this.fileName));
@@ -90,8 +85,8 @@ public class ReplayServer{
     }
 
     private static final int DEFAULT_PORT = 5000;
-    private static final int DEFAULT_RATE = 1000;
-    private static final String DEFAULT_FILE = "../MoteTrack/logs/situps.txt";
+    private static final int DEFAULT_RATE = 100;
+    private static final String DEFAULT_FILE = "logs/situps.txt";
 
     public static void main(String[] args) {
         startServer(args);
@@ -102,7 +97,7 @@ public class ReplayServer{
         startServer(DEFAULT_FILE, DEFAULT_RATE, DEFAULT_PORT);
     }
 
-    private static void startServer(String file, int rate, int port) {
+    private static void startServer(final String file, final int rate, final int port) {
         new ReplayServer(file, rate, port);
         System.out.println("SERVER STARTED");
     }
