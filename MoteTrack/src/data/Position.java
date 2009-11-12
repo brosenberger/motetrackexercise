@@ -31,12 +31,16 @@ public class Position {
         return z;
     }
 
+    public double[] toArray() {
+        return new double[] {x, y, z};
+    }
+
     @Override
     public String toString() {
         return x+" "+y+" "+z;
     }
 
-	public void setX(double x) {
+    	public void setX(double x) {
 		this.x = x;
 	}
 

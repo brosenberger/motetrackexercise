@@ -22,6 +22,7 @@ public class ServerReader extends Observable implements Runnable {
 	private volatile boolean run;
         private Socket client;
         private BufferedReader reader;
+        
 	
 	public ServerReader(final String srv, final int port) {
 		this.srv = srv;

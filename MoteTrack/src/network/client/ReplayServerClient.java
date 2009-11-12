@@ -1,10 +1,14 @@
-package test;
+package network.client;
 
 import network.ServerDataReader;
 import misc.ServerLogger;
 
-public class TestReplayServerConnection {
+public class ReplayServerClient {
 	public static void main(String[] args) {
+            startServer();
+	}
+
+        public static ServerDataReader startServer() {
 		System.out.println("Starting client");
 		String fileName = "logs/ReplayLog"+System.currentTimeMillis()+".txt";
 		System.out.println("Writing results to "+fileName);
@@ -12,5 +16,6 @@ public class TestReplayServerConnection {
 		ServerDataReader reader = new ServerDataReader("localhost",5000,"020000111249;020000136188");
 		reader.addObserver(log);
 		reader.startReader();
-	}
+                return reader;
+        }
 }
