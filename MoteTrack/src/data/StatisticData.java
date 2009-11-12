@@ -57,4 +57,7 @@ public class StatisticData {
         public int getCount() {
                 return this.positions.size();
         }
+        public String toString() {
+        	return this.getStdDeviation().toString();
+        }
 }

@@ -70,6 +70,10 @@ public class SensorData {
         public Position getPos() {
             return pos;
         }
+        
+        public void setPos(Position pos) {
+        	this.pos = pos;
+        }
 
     /**
      *
