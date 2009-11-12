@@ -40,7 +40,7 @@ public class Position {
         return x+" "+y+" "+z;
     }
 
-    	public void setX(double x) {
+    public void setX(double x) {
 		this.x = x;
 	}
 
@@ -51,5 +51,9 @@ public class Position {
 	public void setZ(double z) {
 		this.z = z;
 	}
-    
+    public void addPercentage(double perc) {
+    	this.x *= (1+perc);
+    	this.y *= (1+perc);
+    	this.z *= (1+perc);
+    }
 }
