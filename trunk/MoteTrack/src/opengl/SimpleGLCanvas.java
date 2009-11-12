@@ -6,8 +6,11 @@
 
 package opengl;
 
+import java.beans.PropertyChangeListener;
+import misc.TagIdListModel;
 import com.sun.opengl.util.Animator;
 import data.HistoryCollector;
+import data.SensorData;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -16,26 +19,38 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
+import javax.swing.AbstractAction;
+import javax.swing.AbstractListModel;
+import javax.swing.Action;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.ListModel;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.event.ListDataListener;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.CloseAction;
+import listener.HistoryCollectorListener;
+import misc.TagIdListModel;
 import network.ServerDataReader;
 import network.client.ReplayServerClient;
+import network.client.ServerClient;
 
 /**
  *
@@ -52,14 +67,13 @@ public class SimpleGLCanvas extends JFrame {
     
     private Animator animator;
     private GLRenderer renderer;
-
+    private HistoryCollector historyCollector;
     /** Creates new form MainFrame */
     public SimpleGLCanvas() {
-        initComponents();
+        ServerDataReader sdr = ServerClient.startServer();//"020000136184");
+        historyCollector = new HistoryCollector(sdr);
 
-        /* TEST */
-        ServerDataReader sdr = ReplayServerClient.startServer();
-        HistoryCollector hc = new HistoryCollector(sdr);
+        initComponents();
 
         setTitle("Simple JOGL Application");
 
@@ -110,6 +124,8 @@ public class SimpleGLCanvas extends JFrame {
         historyCheckBox = new JCheckBox();
         beacon2dCheckBox = new JCheckBox();
         resetButton = new JButton();
+        tagIdListScrollPane = new JScrollPane();
+        tagIdList = new JList();
         jMenuBar1 = new JMenuBar();
         jMenu1 = new JMenu();
         jMenuItem1 = new JMenuItem();
@@ -141,9 +157,12 @@ public class SimpleGLCanvas extends JFrame {
             }
         });
 
+        tagIdList.setModel(new TagIdListModel(historyCollector));
+        tagIdListScrollPane.setViewportView(tagIdList);
+
         jMenu1.setText("File");
 
-        jMenuItem1.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_MASK));
+        jMenuItem1.setAction(exitAction);
         jMenuItem1.setText("Exit");
         jMenu1.add(jMenuItem1);
 
@@ -158,10 +177,12 @@ public class SimpleGLCanvas extends JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(canvas, GroupLayout.DEFAULT_SIZE, 713, Short.MAX_VALUE)
+                    .addComponent(label)
+                    .addComponent(tagIdListScrollPane, GroupLayout.PREFERRED_SIZE, 146, GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    .addComponent(canvas, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(label)
-                        .addGap(27, 27, 27)
                         .addComponent(historyCheckBox)
                         .addPreferredGap(ComponentPlacement.UNRELATED)
                         .addComponent(beacon2dCheckBox)
@@ -179,7 +200,9 @@ public class SimpleGLCanvas extends JFrame {
                     .addComponent(beacon2dCheckBox)
                     .addComponent(resetButton))
                 .addPreferredGap(ComponentPlacement.RELATED)
-                .addComponent(canvas, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    .addComponent(tagIdListScrollPane, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
+                    .addComponent(canvas, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -238,6 +261,14 @@ public class SimpleGLCanvas extends JFrame {
         });
     }
 
+    private Action exitAction = new AbstractAction("EXIT") {
+
+        public void actionPerformed(ActionEvent e) {
+            System.exit(0);
+        }
+    };
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JCheckBox beacon2dCheckBox;
     private GLCanvas canvas;
@@ -246,6 +277,8 @@ public class SimpleGLCanvas extends JFrame {
     private JMenuBar jMenuBar1;
     private JMenuItem jMenuItem1;
     private JButton resetButton;
+    private JList tagIdList;
+    private JScrollPane tagIdListScrollPane;
     // End of variables declaration//GEN-END:variables
 
 }

@@ -146,36 +146,13 @@ public class GLRenderer implements GLEventListener {
         gl.glTranslated(move_x, move_y, 0);
         gl.glTranslated(old_rotx, old_roty, old_rotz);
         moveAbsolute(gl);
-        
-//        gl.glTranslated(move_x, move_y, move_z);
-//
-//        // Rotate the entire assembly of gears based on how the user
-//        // dragged the mouse around
-        
-//
-//        gl.glTranslated(old_rotx, old_roty, old_rotz);
-//        gl.glTranslated(old_x, old_y, old_z);
-////        zoom(rezoom, gl);
-//
-//         rotateAbsolute(gl);
-//        moveAbsolute(gl);
+
 
         gl.glRotated(20, 1, 0, 0);
         gl.glRotated(25, 0, 1,0);
         gl.glTranslated(0 , -5, -10);
         gl.glRotated(-90, 1, 0, 0);
         gl.glTranslated(-7, -3.5, 0);
-
-
-
-//        rotateView(20, 0, 0);
-//        rotateView(0, 25, 0);
-//        moveView(0, -5, -10);
-//        rotateView(-90, 0, 0);
-//        moveView(-7, -3.5, 0);
-//
-
-
 
         // END OF MOVING VIEWPOINT //
 
