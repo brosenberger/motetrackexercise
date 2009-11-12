@@ -86,7 +86,7 @@ public class ReplayServer{
 
     private static final int DEFAULT_PORT = 5000;
     private static final int DEFAULT_RATE = 100;
-    private static final String DEFAULT_FILE = "logs/situps.txt";
+    private static final String DEFAULT_FILE = "../MoteTrack/logs/situps.txt";
 
     public static void main(String[] args) {
         startServer(args);

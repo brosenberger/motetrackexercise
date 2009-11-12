@@ -12,7 +12,13 @@ public class ServerDataReader extends ServerReader {
     HashMap<String, Object> map;
 
     private List<ServerDataListener> listeners;
+    private boolean filterIds;
+    public ServerDataReader(String srv, int port) {
+        super(srv, port);
+        filterIds = false;
 
+        listeners = new ArrayList<ServerDataListener>();
+    }
 
     public ServerDataReader(String srv, int port, String ids) {
             super(srv, port);
@@ -23,17 +29,20 @@ public class ServerDataReader extends ServerReader {
                     map.put(id, "");
             }
             listeners = new ArrayList<ServerDataListener>();
+            filterIds = true;
     }
 
     @Override
     protected void updateObserver(String msg) {
             String[] sMsg = msg.split(" ");
             String id = sMsg[0];
-            if (!map.containsKey(id)) {
+            if (filterIds && !map.containsKey(id)) {
                 return;
             }
 //		System.out.println(msg);
-            SensorData data = new SensorData(id,Long.parseLong(sMsg[1]),Double.parseDouble(sMsg[2]),Double.parseDouble(sMsg[3]),Double.parseDouble(sMsg[4]));
+            long timestamp = Long.parseLong(sMsg[1]);
+            if (timestamp < System.currentTimeMillis()-500) return; // Server liefert zu beginn 2 minuten alte daten
+            SensorData data = new SensorData(id,timestamp,Double.parseDouble(sMsg[2]),Double.parseDouble(sMsg[3]),Double.parseDouble(sMsg[4]));
             this.setChanged();
             this.notifyObservers(data);
             fireEvent(data);
