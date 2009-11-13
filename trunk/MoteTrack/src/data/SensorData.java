@@ -1,5 +1,6 @@
 package data;
 
+import exceptions.IllegalTagIdFormatException;
 import exceptions.NoPrevDataException;
 import exceptions.WrongIdException;
 import java.util.ArrayList;
@@ -100,5 +101,74 @@ public class SensorData {
 
     public void setHistory(ArrayList<SensorData> history) {
         this.history = history;
+    }
+
+
+    public static ArrayList<String> format(ArrayList<String> list, boolean toShort) throws IllegalTagIdFormatException {
+        ArrayList<String> newList = new ArrayList<String>();
+        for (String s : list) {
+            newList.add(formatId(s, toShort));
+        }
+        return newList;
+    }
+
+    public static String formatId(String id, boolean toShort) throws IllegalTagIdFormatException {
+        if (isValidTagId(id)) {
+            throw new IllegalTagIdFormatException(id);
+        }
+        StringBuffer sb = new StringBuffer(id);
+        switch (sb.length()) {
+            case 12:
+                if (toShort) return id;
+                sb.insert(9, '-');
+                sb.insert(6, '-');
+                sb.insert(3, '-');
+                break;
+            case 15:
+                if (!toShort) return id;
+                sb.deleteCharAt(12);
+                sb.deleteCharAt(8);
+                sb.deleteCharAt(4);
+                break;
+            default:
+                // Should never be reached as isValidTagId checks that
+                throw new RuntimeException("ILLEGAL TAG ID LENGTH (SHOULD NEVER BE REACHED)");
+        }
+
+
+        return sb.toString();
+    }
+
+    public static boolean isValidTagId(String id) {
+        switch (id.length()) {
+            case 12:
+                 try {
+                    Long.parseLong(id);
+                } catch (NumberFormatException e) {
+                    return false;
+                }
+                break;
+            case 15:
+                String[] idParts = id.split("-");
+                if (idParts.length != 4) {
+                    return false;
+                }
+
+                for (String s : idParts) {
+                    if (s.length() != 3) {
+                        return false;
+                    }
+                    try {
+                        Long.parseLong(s);
+                    } catch (NumberFormatException e) {
+                        return false;
+                    }
+                }
+                break;
+            default:
+                return false;
+        }
+
+        return true;
     }
 }

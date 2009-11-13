@@ -61,8 +61,7 @@ public class ServerReader extends Observable implements Runnable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+                    System.err.println("connection not possible");
 		} finally {
                     closeConnection();
                 }
