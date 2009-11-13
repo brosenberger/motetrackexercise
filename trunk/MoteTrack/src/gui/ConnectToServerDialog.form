@@ -33,19 +33,17 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <EmptySpace min="-2" pref="37" max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="replayLogTextField" min="-2" pref="83" max="-2" attributes="1"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Component id="replayLogLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Group type="103" alignment="0" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="tagIdTextField" alignment="1" max="32767" attributes="1"/>
-                              <Component id="tagIdListScrollPane" alignment="1" min="-2" pref="107" max="-2" attributes="1"/>
-                              <Group type="102" alignment="1" attributes="1">
-                                  <Component id="addButton" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="32767" attributes="0"/>
-                                  <Component id="removeButton" min="-2" max="-2" attributes="0"/>
-                              </Group>
+                          <Component id="tagIdTextField" alignment="1" max="32767" attributes="1"/>
+                          <Component id="tagIdListScrollPane" alignment="0" pref="107" max="32767" attributes="1"/>
+                          <Group type="102" alignment="1" attributes="1">
+                              <Component id="addButton" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="32767" attributes="0"/>
+                              <Component id="removeButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="idLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="serverAddressTextField" alignment="0" max="32767" attributes="1"/>
                       </Group>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
@@ -65,7 +63,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="replayLogLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="replayLogTextField" min="-2" max="-2" attributes="0"/>
+              <Component id="serverAddressTextField" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="idLabel" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -100,11 +98,17 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Abort"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="abortButtonActionPerformed"/>
+      </Events>
     </Component>
-    <Component class="javax.swing.JTextField" name="replayLogTextField">
+    <Component class="javax.swing.JTextField" name="serverAddressTextField">
       <Properties>
-        <Property name="text" type="java.lang.String" value="localhost"/>
+        <Property name="text" type="java.lang.String" value="localhost:5000"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="serverAddressTextFieldActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="replayLogLabel">
       <Properties>
@@ -120,14 +124,8 @@
       <SubComponents>
         <Component class="javax.swing.JList" name="tagIdList">
           <Properties>
-            <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
-              <StringArray count="5">
-                <StringItem index="0" value="Item 1"/>
-                <StringItem index="1" value="Item 2"/>
-                <StringItem index="2" value="Item 3"/>
-                <StringItem index="3" value="Item 4"/>
-                <StringItem index="4" value="Item 5"/>
-              </StringArray>
+            <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+              <Connection code="simpleListModel" type="code"/>
             </Property>
           </Properties>
         </Component>
@@ -139,6 +137,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="-"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="removeButtonActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="idLabel">
       <Properties>
@@ -149,6 +150,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="+"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addButtonActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>
