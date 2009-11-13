@@ -11,16 +11,32 @@
 
 package gui;
 
+import data.SensorData;
+import exceptions.IllegalTagIdFormatException;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import javax.swing.ListModel;
+import javax.swing.event.ListDataListener;
+import misc.SimpleListModel;
+import network.ServerDataReader;
+
 /**
  *
  * @author tscheinecker
  */
 public class ConnectToServerDialog extends javax.swing.JDialog {
 
+    private SimpleListModel simpleListModel;
+    private MoteTrackApp parent;
+
     /** Creates new form ConnectToServerDialog */
-    public ConnectToServerDialog(java.awt.Frame parent, boolean modal) {
+    public ConnectToServerDialog(MoteTrackApp parent, boolean modal) {
         super(parent, modal);
+        simpleListModel = new SimpleListModel();
+        this.parent = parent;
         initComponents();
+        
+
     }
 
     /** This method is called from within the constructor to
@@ -34,7 +50,7 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
 
         connectButton = new javax.swing.JButton();
         abortButton = new javax.swing.JButton();
-        replayLogTextField = new javax.swing.JTextField();
+        serverAddressTextField = new javax.swing.JTextField();
         replayLogLabel = new javax.swing.JLabel();
         tagIdListScrollPane = new javax.swing.JScrollPane();
         tagIdList = new javax.swing.JList();
@@ -58,23 +74,39 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         });
 
         abortButton.setText("Abort");
+        abortButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                abortButtonActionPerformed(evt);
+            }
+        });
 
-        replayLogTextField.setText("localhost");
+        serverAddressTextField.setText("localhost:5000");
+        serverAddressTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                serverAddressTextFieldActionPerformed(evt);
+            }
+        });
 
         replayLogLabel.setText("IP Address");
 
-        tagIdList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
+        tagIdList.setModel(simpleListModel);
         tagIdListScrollPane.setViewportView(tagIdList);
 
         removeButton.setText("-");
+        removeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeButtonActionPerformed(evt);
+            }
+        });
 
         idLabel.setText("IDs");
 
         addButton.setText("+");
+        addButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -84,17 +116,16 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(37, 37, 37)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(replayLogTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(replayLogLabel)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(tagIdTextField, javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(tagIdListScrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                    .addComponent(addButton)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(removeButton)))
-                            .addComponent(idLabel)))
+                            .addComponent(tagIdTextField, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(tagIdListScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(addButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(removeButton))
+                            .addComponent(idLabel)
+                            .addComponent(serverAddressTextField)))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(connectButton)
@@ -111,7 +142,7 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(replayLogLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(replayLogTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(serverAddressTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(idLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -133,8 +164,53 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
-        // TODO add your handling code here:
+        String ids = simpleListModel.getListEntries();
+        String server = serverAddressTextField.getText();
+        if (server.length() == 0) {
+            JOptionPane.showMessageDialog(this, "You must provide a server address", "Server Address Missing", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        String[] split = server.split(":");
+        if (split.length != 2) {
+            JOptionPane.showMessageDialog(this, "The server address format has to be:\n IP_Address:Port", "Invalid Server Address", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        String address = split[0];
+
+        try {
+            int port = Integer.parseInt(split[1]);
+            parent.connectToServer(new ServerDataReader(address, port, ids));
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "The Port has to be a number", "Invalid Port", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        dispose();
     }//GEN-LAST:event_connectButtonActionPerformed
+
+    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+        
+        try {
+            String tagId = SensorData.formatId(tagIdTextField.getText(), false);
+            simpleListModel.addElement(tagId);
+        } catch (IllegalTagIdFormatException e) {
+            JOptionPane.showMessageDialog(this, "You entered an invalid Tag ID", "Invalid Tag ID", JOptionPane.ERROR_MESSAGE);
+        }
+        
+    }//GEN-LAST:event_addButtonActionPerformed
+
+    private void removeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeButtonActionPerformed
+        simpleListModel.removeElements(tagIdList.getSelectedIndices());
+    }//GEN-LAST:event_removeButtonActionPerformed
+
+    private void abortButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abortButtonActionPerformed
+        dispose();
+    }//GEN-LAST:event_abortButtonActionPerformed
+
+    private void serverAddressTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serverAddressTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_serverAddressTextFieldActionPerformed
 
     /**
     * @param args the command line arguments
@@ -142,8 +218,9 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                ConnectToServerDialog dialog = new ConnectToServerDialog(new javax.swing.JFrame(), true);
+                ConnectToServerDialog dialog = new ConnectToServerDialog(new MoteTrackApp(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
                     }
@@ -160,7 +237,7 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
     private javax.swing.JLabel idLabel;
     private javax.swing.JButton removeButton;
     private javax.swing.JLabel replayLogLabel;
-    private javax.swing.JTextField replayLogTextField;
+    private javax.swing.JTextField serverAddressTextField;
     private javax.swing.JList tagIdList;
     private javax.swing.JScrollPane tagIdListScrollPane;
     private javax.swing.JTextField tagIdTextField;

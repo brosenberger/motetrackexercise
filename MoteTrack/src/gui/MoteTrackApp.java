@@ -18,7 +18,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.opengl.GLCanvas;
@@ -66,14 +65,12 @@ public class MoteTrackApp extends JFrame {
 
     /** Creates new form MainFrame */
     public MoteTrackApp() {
-        ServerDataReader sdr = ReplayServerClient.startServer();//"020000136184");
-        historyCollector = new HistoryCollector(sdr);
+
         startServerDialog = new StartServerDialog(this, true);
         connectToServerDialog = new ConnectToServerDialog(this, true);
 
         initComponents();
 
-        ((TagIdListModel) tagIdList.getModel()).setHistorycollector(historyCollector);
         tagIdList.addListSelectionListener(listSelectionListener);
 
         setTitle("Motion Tracking Application");
@@ -316,6 +313,13 @@ public class MoteTrackApp extends JFrame {
             renderer.setSelectedTagIds(selectedIdsList);
         }
     };
+
+    public void connectToServer(ServerDataReader client) {
+        System.out.println("connect to server");
+        client.startReader();
+        historyCollector = new HistoryCollector(client);
+        ((TagIdListModel) tagIdList.getModel()).setHistorycollector(historyCollector);
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
