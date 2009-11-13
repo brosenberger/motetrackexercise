@@ -41,7 +41,7 @@ public class ServerDataReader extends ServerReader {
             }
 //		System.out.println(msg);
             long timestamp = Long.parseLong(sMsg[1]);
-            if (timestamp < System.currentTimeMillis()-500) return; // Server liefert zu beginn 2 minuten alte daten
+//            if (timestamp < System.currentTimeMillis()-500) return; // Server liefert zu beginn 2 minuten alte daten
             SensorData data = new SensorData(id,timestamp,Double.parseDouble(sMsg[2]),Double.parseDouble(sMsg[3]),Double.parseDouble(sMsg[4]));
             this.setChanged();
             this.notifyObservers(data);

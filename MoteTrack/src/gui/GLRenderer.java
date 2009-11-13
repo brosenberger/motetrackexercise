@@ -1,4 +1,4 @@
-package opengl;
+package gui;
 
 import data.Position;
 import data.SensorData;
@@ -77,9 +77,6 @@ public class GLRenderer implements GLEventListener {
     private Vector3d absolutPosition;
     private Vector3d absolutDirection;
 
-    private void move(double x, double y, double z, GL gl) {
-        gl.glTranslated(x, y, z);
-    }
 
     private void moveAbsolute(GL gl) {
         gl.glTranslated(absolutPosition.getX(), absolutPosition.getY(), absolutPosition.getZ());
@@ -90,30 +87,6 @@ public class GLRenderer implements GLEventListener {
         gl.glRotated(pitch, 1, 0, 0);
         gl.glRotated(roll, 0, 1, 0);
         gl.glRotated(yaw, 0, 0, 1);
-    }
-
-    private void rotateView(double pitch, double roll, double yaw) {
-            absolutDirection.rotate(pitch, Vector3d.xAxis);
-            absolutDirection.rotate(roll, Vector3d.yAxis);
-            absolutDirection.rotate(yaw, Vector3d.zAxis);
-    }
-
-    private void rotateAbsolute(GL gl) {
-        gl.glRotated(absolutDirection.getPitch(), 1, 0, 0);
-        gl.glRotated(absolutDirection.getRoll(), 0, 1, 0);
-        gl.glRotated(absolutDirection.getYaw(), 0, 0, 1);
-        System.out.println("rot: "+absolutDirection);
-        System.out.println(absolutDirection.getPitch());
-        System.out.println(absolutDirection.getRoll());
-        System.out.println(absolutDirection.getYaw());
-    }
-
-    private void moveView(double x, double y, double z) {
-            Vector3d v = new Vector3d(move_x, move_y, move_z);
-            v.rotate(view_rotx, Vector3d.xAxis);
-            v.rotate(view_roty, Vector3d.yAxis);
-            v.rotate(view_rotz, Vector3d.zAxis);
-            absolutPosition.add(v);
     }
 
     private void resetAbsoluteValues() {

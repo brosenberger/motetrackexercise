@@ -4,28 +4,22 @@
  * Created on 30. Juli 2008, 16:18
  */
 
-package opengl;
+package gui;
 
-import java.beans.PropertyChangeListener;
-import misc.TagIdListModel;
+import javax.swing.event.ListSelectionEvent;
 import com.sun.opengl.util.Animator;
 import data.HistoryCollector;
-import data.SensorData;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.opengl.GLCanvas;
 import javax.media.opengl.GLCapabilities;
 import javax.swing.AbstractAction;
-import javax.swing.AbstractListModel;
 import javax.swing.Action;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -39,25 +33,20 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.ListModel;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
-import javax.swing.event.ListDataListener;
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.CloseAction;
-import listener.HistoryCollectorListener;
+import javax.swing.event.ListSelectionListener;
 import misc.TagIdListModel;
 import network.ServerDataReader;
 import network.client.ReplayServerClient;
-import network.client.ServerClient;
 
 /**
  *
  * @author cylab
  * @author mbien
  */
-public class SimpleGLCanvas extends JFrame {
+public class MainFrame extends JFrame {
 
     static {
         // When using a GLCanvas, we have to set the Popup-Menues to be HeavyWeight,
@@ -68,14 +57,22 @@ public class SimpleGLCanvas extends JFrame {
     private Animator animator;
     private GLRenderer renderer;
     private HistoryCollector historyCollector;
+    private StartServerDialog startServerDialog;
+    private ConnectToServerDialog connectToServerDialog;
+
     /** Creates new form MainFrame */
-    public SimpleGLCanvas() {
-        ServerDataReader sdr = ServerClient.startServer();//"020000136184");
+    public MainFrame() {
+        ServerDataReader sdr = ReplayServerClient.startServer();//"020000136184");
         historyCollector = new HistoryCollector(sdr);
+        startServerDialog = new StartServerDialog(this, true);
+        connectToServerDialog = new ConnectToServerDialog(this, true);
 
         initComponents();
 
-        setTitle("Simple JOGL Application");
+        
+        tagIdList.addListSelectionListener(listSelectionListener);
+
+        setTitle("Motion Tracking Application");
 
         renderer = new GLRenderer();
         canvas.addGLEventListener(renderer);
@@ -127,8 +124,10 @@ public class SimpleGLCanvas extends JFrame {
         tagIdListScrollPane = new JScrollPane();
         tagIdList = new JList();
         jMenuBar1 = new JMenuBar();
-        jMenu1 = new JMenu();
-        jMenuItem1 = new JMenuItem();
+        fileMenuItem = new JMenu();
+        startServerItem = new JMenuItem();
+        connectMenuItem = new JMenuItem();
+        exitMenuItem = new JMenuItem();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -157,16 +156,32 @@ public class SimpleGLCanvas extends JFrame {
             }
         });
 
-        tagIdList.setModel(new TagIdListModel(historyCollector));
+        tagIdList.setModel(new TagIdListModel());
         tagIdListScrollPane.setViewportView(tagIdList);
 
-        jMenu1.setText("File");
+        fileMenuItem.setText("File");
 
-        jMenuItem1.setAction(exitAction);
-        jMenuItem1.setText("Exit");
-        jMenu1.add(jMenuItem1);
+        startServerItem.setText("Start Server");
+        startServerItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                startServerItemActionPerformed(evt);
+            }
+        });
+        fileMenuItem.add(startServerItem);
 
-        jMenuBar1.add(jMenu1);
+        connectMenuItem.setText("Connect to Server");
+        connectMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                connectMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenuItem.add(connectMenuItem);
+
+        exitMenuItem.setAction(exitAction);
+        exitMenuItem.setText("Exit");
+        fileMenuItem.add(exitMenuItem);
+
+        jMenuBar1.add(fileMenuItem);
 
         setJMenuBar(jMenuBar1);
 
@@ -221,6 +236,16 @@ public class SimpleGLCanvas extends JFrame {
         renderer.reset();
     }//GEN-LAST:event_resetButtonActionPerformed
 
+    private void startServerItemActionPerformed(ActionEvent evt) {//GEN-FIRST:event_startServerItemActionPerformed
+        startServerDialog.setLocationRelativeTo(this);
+        startServerDialog.setVisible(true);
+    }//GEN-LAST:event_startServerItemActionPerformed
+
+    private void connectMenuItemActionPerformed(ActionEvent evt) {//GEN-FIRST:event_connectMenuItemActionPerformed
+        connectToServerDialog.setLocationRelativeTo(this);
+        connectToServerDialog.setVisible(true);
+    }//GEN-LAST:event_connectMenuItemActionPerformed
+
     /**
      * Called from within initComponents().
      * hint: to customize the generated code choose 'Customize Code' in the contextmenu
@@ -254,7 +279,7 @@ public class SimpleGLCanvas extends JFrame {
                     Logger.getLogger(getClass().getName()).log(Level.INFO, "can not enable system look and feel", ex);
                 }
 
-                SimpleGLCanvas frame = new SimpleGLCanvas();
+                MainFrame frame = new MainFrame();
 
                 frame.setVisible(true);
             }
@@ -268,15 +293,25 @@ public class SimpleGLCanvas extends JFrame {
         }
     };
 
+    private ListSelectionListener listSelectionListener = new ListSelectionListener() {
+
+        public void valueChanged(ListSelectionEvent e) {
+            tagIdList.getSelectedValues();
+//            tagIdList.get
+        }
+    };
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JCheckBox beacon2dCheckBox;
     private GLCanvas canvas;
+    private JMenuItem connectMenuItem;
+    private JMenuItem exitMenuItem;
+    private JMenu fileMenuItem;
     private JCheckBox historyCheckBox;
-    private JMenu jMenu1;
     private JMenuBar jMenuBar1;
-    private JMenuItem jMenuItem1;
     private JButton resetButton;
+    private JMenuItem startServerItem;
     private JList tagIdList;
     private JScrollPane tagIdListScrollPane;
     // End of variables declaration//GEN-END:variables
