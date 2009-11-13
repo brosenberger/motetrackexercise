@@ -3,6 +3,7 @@ package gui;
 import data.Position;
 import data.SensorData;
 import data.Vector3d;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -28,13 +29,23 @@ import javax.media.opengl.glu.GLU;
  *
  * This version is equal to Brian Paul's version 1.2 1999/10/21
  */
-public class GLRenderer implements GLEventListener {
+public class DataVisualisation implements GLEventListener {
 
     private boolean drawHistory = true, draw2dBeacon = true;
+    private ArrayList<String> selectedTagIds;
 
+    public void setSelectedTagIds(ArrayList<String> list) {
+        selectedTagIds = list;
+        System.out.println("selected tag ids changed");
+        for (String s : list) {
+            System.out.println(s);
+        }
+    }
+    
     public void init(GLAutoDrawable drawable) {
         absolutPosition = new Vector3d(0, 0, 0);
         absolutDirection = new Vector3d(0, 0, 1);
+        selectedTagIds = new ArrayList<String>();
         // Use debug pipeline
         // drawable.setGL(new DebugGL(drawable.getGL()));
 
@@ -156,7 +167,7 @@ public class GLRenderer implements GLEventListener {
 
         // Draw Cell1
         gl.glBegin(GL.GL_LINE_LOOP);
-            gl.glColor3d(1, 0, 0);
+            setDrawingColor(gl, Color.GREEN);
             gl.glVertex3d( 8.028, 0.440, 2.270);
             gl.glVertex3d(14.298, 0.890, 2.250);
             gl.glVertex3d(12.558, 6.890, 2.260);
@@ -200,13 +211,13 @@ public class GLRenderer implements GLEventListener {
 
     private void drawCoordinateAxes(GL gl) {
         gl.glBegin(GL.GL_LINES);
-            gl.glColor3d(1, 0, 0);
+            setDrawingColor(gl, Color.RED);
             gl.glVertex3d(0, 0, 0);
             gl.glVertex3d(5, 0, 0);
-            gl.glColor3d(0, 1, 0);
+            setDrawingColor(gl, Color.GREEN);
             gl.glVertex3d(0, 0, 0);
             gl.glVertex3d(0, 5, 0);
-            gl.glColor3d(0, 0, 1);
+            setDrawingColor(gl, Color.BLUE);
             gl.glVertex3d(0, 0, 0);
             gl.glVertex3d(0, 0, 5);
         gl.glEnd();
@@ -259,26 +270,41 @@ public class GLRenderer implements GLEventListener {
             drawTagHistory(data, gl);
         }
 
-        // draw 2d beacon
-        if (draw2dBeacon) {
-            gl.glBegin(gl.GL_LINES);
-                gl.glColor3d(1, 1, 1);
-                gl.glVertex3dv(posArr, 0);
-                gl.glVertex3d(x, y, 0);
-
-                gl.glVertex3d(x - 0.1, y, 0);
-                gl.glVertex3d(x + 0.1, y, 0);
-
-                gl.glVertex3d(x, y - 0.1, 0);
-                gl.glVertex3d(x, y + 0.1, 0);
-            gl.glEnd();
+        if (selectedTagIds.contains(data.getId())) {
+            setDrawingColor(gl, Color.RED);
+        } else {
+            setDrawingColor(gl, Color.WHITE);
         }
 
+        // draw 2d beacon
+        if (draw2dBeacon) {
+            draw2dBeacon(pos, gl);
+        }
+
+        // drawing sphere
         moveTo(posArr, gl);
         gl.glScaled(0.2, 0.2, 0.2);
         drawSphere(25, gl);
         gl.glScaled(5, 5, 5);
         moveBack(posArr, gl);
+    }
+
+    private void setDrawingColor(GL gl, Color color) {
+        gl.glColor4fv(color.getRGBComponents(null), 0);
+    }
+
+    private void draw2dBeacon(Position pos, GL gl) {
+        double x = pos.getX(), y = pos.getY(), z = pos.getZ();
+        gl.glBegin(gl.GL_LINES);
+            gl.glVertex3d(x, y, z);
+            gl.glVertex3d(x, y, 0);
+
+            gl.glVertex3d(x - 0.1, y, 0);
+            gl.glVertex3d(x + 0.1, y, 0);
+
+            gl.glVertex3d(x, y - 0.1, 0);
+            gl.glVertex3d(x, y + 0.1, 0);
+        gl.glEnd();
     }
 
     private void moveTo(double[] pos, GL gl) {

@@ -47,7 +47,7 @@ public class TagIdListModel implements ListModel {
             tagIds = SensorData.format(hc.getTagids(), false);
         } catch (IllegalTagIdFormatException ex) {
             tagIds = new ArrayList<String>();
-            String msg = "Tag Id Format Exception occured while setting HistoryCollector";
+            String msg = "Tag Id Format Exception occured while setting HistoryCollector - ID: "+ex.getIllegalTagId();
             System.err.println(msg);
             Logger.getLogger(TagIdListModel.class.getName()).log(Level.SEVERE, msg, ex);
         }
@@ -62,7 +62,7 @@ public class TagIdListModel implements ListModel {
                         tagIds.add(id);
                         fireListDataListeners(tagIds.indexOf(id));
                     } catch (IllegalTagIdFormatException ex) {
-                        String msg = "Tag Id Format Exception occured while handling newTagId event";
+                        String msg = "Tag Id Format Exception occured while handling newTagId event - ID: "+ex.getIllegalTagId();
                         System.err.println(msg);
                         Logger.getLogger(TagIdListModel.class.getName()).log(Level.SEVERE, msg, ex);
                     }

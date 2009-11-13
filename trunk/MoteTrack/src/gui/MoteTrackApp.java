@@ -6,15 +6,19 @@
 
 package gui;
 
+import exceptions.IllegalTagIdFormatException;
 import javax.swing.event.ListSelectionEvent;
 import com.sun.opengl.util.Animator;
 import data.HistoryCollector;
+import data.SensorData;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.opengl.GLCanvas;
@@ -46,7 +50,7 @@ import network.client.ReplayServerClient;
  * @author cylab
  * @author mbien
  */
-public class MainFrame extends JFrame {
+public class MoteTrackApp extends JFrame {
 
     static {
         // When using a GLCanvas, we have to set the Popup-Menues to be HeavyWeight,
@@ -55,13 +59,13 @@ public class MainFrame extends JFrame {
     }
     
     private Animator animator;
-    private GLRenderer renderer;
+    private DataVisualisation renderer;
     private HistoryCollector historyCollector;
     private StartServerDialog startServerDialog;
     private ConnectToServerDialog connectToServerDialog;
 
     /** Creates new form MainFrame */
-    public MainFrame() {
+    public MoteTrackApp() {
         ServerDataReader sdr = ReplayServerClient.startServer();//"020000136184");
         historyCollector = new HistoryCollector(sdr);
         startServerDialog = new StartServerDialog(this, true);
@@ -69,12 +73,12 @@ public class MainFrame extends JFrame {
 
         initComponents();
 
-        
+        ((TagIdListModel) tagIdList.getModel()).setHistorycollector(historyCollector);
         tagIdList.addListSelectionListener(listSelectionListener);
 
         setTitle("Motion Tracking Application");
 
-        renderer = new GLRenderer();
+        renderer = new DataVisualisation();
         canvas.addGLEventListener(renderer);
         animator = new Animator(canvas);
 
@@ -279,7 +283,7 @@ public class MainFrame extends JFrame {
                     Logger.getLogger(getClass().getName()).log(Level.INFO, "can not enable system look and feel", ex);
                 }
 
-                MainFrame frame = new MainFrame();
+                MoteTrackApp frame = new MoteTrackApp();
 
                 frame.setVisible(true);
             }
@@ -296,8 +300,20 @@ public class MainFrame extends JFrame {
     private ListSelectionListener listSelectionListener = new ListSelectionListener() {
 
         public void valueChanged(ListSelectionEvent e) {
-            tagIdList.getSelectedValues();
-//            tagIdList.get
+            Object[] selectedIds = tagIdList.getSelectedValues();
+            ArrayList<String> selectedIdsList = new ArrayList<String>();
+            for (Object id : selectedIds) {
+                selectedIdsList.add((String)id);
+            }
+            try {
+                selectedIdsList = SensorData.format(selectedIdsList, true);
+            } catch (IllegalTagIdFormatException ex) {
+                String msg = "IllegalTagIdFormatException occured while handling selection change event - ID: "+ex.getIllegalTagId();
+                System.err.println(msg);
+                Logger.getLogger(MoteTrackApp.class.getName()).log(Level.SEVERE, msg, ex);
+            }
+
+            renderer.setSelectedTagIds(selectedIdsList);
         }
     };
 

@@ -18,7 +18,7 @@ package gui;
 public class StartServerDialog extends javax.swing.JDialog {
 
     /** Creates new form ConnectToServerDialog */
-    public StartServerDialog(MainFrame parent, boolean modal) {
+    public StartServerDialog(MoteTrackApp parent, boolean modal) {
         super(parent, modal);
         initComponents();
     }
@@ -103,7 +103,7 @@ public class StartServerDialog extends javax.swing.JDialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                StartServerDialog dialog = new StartServerDialog(new MainFrame(), true);
+                StartServerDialog dialog = new StartServerDialog(new MoteTrackApp(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
