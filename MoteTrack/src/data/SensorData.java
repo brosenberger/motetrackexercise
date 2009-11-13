@@ -113,7 +113,7 @@ public class SensorData {
     }
 
     public static String formatId(String id, boolean toShort) throws IllegalTagIdFormatException {
-        if (isValidTagId(id)) {
+        if (!isValidTagId(id)) {
             throw new IllegalTagIdFormatException(id);
         }
         StringBuffer sb = new StringBuffer(id);
@@ -126,13 +126,13 @@ public class SensorData {
                 break;
             case 15:
                 if (!toShort) return id;
-                sb.deleteCharAt(12);
-                sb.deleteCharAt(8);
-                sb.deleteCharAt(4);
+                sb.deleteCharAt(11);
+                sb.deleteCharAt(7);
+                sb.deleteCharAt(3);
                 break;
             default:
                 // Should never be reached as isValidTagId checks that
-                throw new RuntimeException("ILLEGAL TAG ID LENGTH (SHOULD NEVER BE REACHED)");
+                throw new RuntimeException("ILLEGAL TAG ID LENGTH (SHOULD NEVER BE REACHED) - ID: "+id);
         }
 
 
