@@ -8,10 +8,29 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class ReplayServer{
+public class ReplayServer implements Runnable{
+    private static final int DEFAULT_PORT = 5000;
+    private static final int DEFAULT_RATE = 100;
+    private static final String DEFAULT_FILE = "../MoteTrack/logs/default.txt";
+
     private volatile boolean run;
+    private String fileName;
+    private int rate;
+    private int port;
+
+    public ReplayServer(String fileName, int port) {
+        this(fileName, -1, port);
+    }
 
     public ReplayServer(String fileName, int rate, int port) {
+        this.fileName = fileName;
+        this.rate = rate;
+        this.port = port;
+        Thread t = new Thread(this);
+        t.start();
+    }
+
+    private void startReplayServer() {
         run = true;
         int id = 1;
 
@@ -34,7 +53,12 @@ public class ReplayServer{
         run = false;
     }
 
+    public void run() {
+        startReplayServer();
+    }
+
     private class ClientHandler implements Runnable {
+
         private String fileName;
         private int rate;
         private Socket client;
@@ -60,10 +84,12 @@ public class ReplayServer{
                 out = new PrintWriter(this.client.getOutputStream());
                 /* die server quittiert jetzt seinen dienst sobald der stream
                  * einen error hatte - thomas */
-                while (true && !out.checkError()) {
+                while (run && !out.checkError()) {
                     while ((read = reader.readLine()) != null && !out.checkError()) {
                         out.println(read);
-                        Thread.sleep(rate);
+                        if (rate != -1) {
+                            Thread.sleep(rate);
+                        }
                     }
                     reader.close();
                     reader = new BufferedReader(new FileReader(this.fileName));
@@ -83,10 +109,6 @@ public class ReplayServer{
             }
         }
     }
-
-    private static final int DEFAULT_PORT = 5000;
-    private static final int DEFAULT_RATE = 100;
-    private static final String DEFAULT_FILE = "../MoteTrack/logs/default.txt";
 
     public static void main(String[] args) {
         startServer(args);

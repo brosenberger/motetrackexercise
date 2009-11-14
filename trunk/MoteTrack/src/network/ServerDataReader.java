@@ -1,9 +1,9 @@
 package network;
 
+import exceptions.ClientAlreadyExistsException;
 import java.util.HashMap;
 
 import data.SensorData;
-import exceptions.ClientAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
 import listener.ServerDataListener;
@@ -11,7 +11,6 @@ import listener.ServerDataListener;
 public class ServerDataReader extends ServerReader {
     private String ids;
     private HashMap<String, Object> map;
-    private static HashMap<String, ServerDataReader> serverDataReaders = new HashMap<String, ServerDataReader>();
 
     private List<ServerDataListener> listeners;
     private boolean filterIds;
@@ -21,10 +20,6 @@ public class ServerDataReader extends ServerReader {
 
     public ServerDataReader(String srv, int port, String ids) throws ClientAlreadyExistsException {
         super(srv, port);
-        String adr = srv+":"+port;
-        if (serverDataReaders.containsKey(adr)) {
-            throw new ClientAlreadyExistsException(serverDataReaders.get(adr));
-        }
         listeners = new ArrayList<ServerDataListener>();
 
         if (ids == null || ids.length() == 0) {
@@ -40,7 +35,6 @@ public class ServerDataReader extends ServerReader {
             filterIds = true;
         }
 
-        serverDataReaders.put(srv+":"+port, this);
     }
 
     @Override

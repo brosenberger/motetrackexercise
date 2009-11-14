@@ -1,11 +1,12 @@
 package test;
 
 import data.Position;
+import exceptions.ClientAlreadyExistsException;
 import network.NormalizedServerDataReader;
 import network.ServerDataReader;
 
 public class TestNormalizationReader {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ClientAlreadyExistsException {
 		// TODO Auto-generated method stub
 		//new Position(0.002612373011961519, 0.010537201740807226, 0.010896639502163345)
 		System.out.println("Starting client");
