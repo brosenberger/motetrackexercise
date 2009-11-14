@@ -13,9 +13,14 @@ package gui;
 
 import data.Position;
 import data.SensorData;
+import exceptions.ClientAlreadyExistsException;
 import exceptions.IllegalTagIdFormatException;
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.ListModel;
@@ -143,7 +148,7 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         filenameLabel.setText("Filename");
         filenameLabel.setEnabled(false);
 
-        filenameTextField.setText("<time>.txt");
+        filenameTextField.setText("<yy'.'MM'.'dd kk'-'mm'-'ss>.log");
         filenameTextField.setEnabled(false);
 
         browseButton.setText("Browse");
@@ -272,11 +277,22 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
             }
 
             if (logCheckBox.isSelected()) {
-                String filename = pathTextField.getText() + formatFilename(filenameTextField.getText());
+                // Append path seperator at end of path name
+                String path = pathTextField.getText();
+                char lastChar = path.charAt(path.length()-1);
+                if (lastChar != '/' && lastChar != '\\') {
+                    path = path+File.separatorChar;
+                }
+
+                String filename = path + formatFilename(filenameTextField.getText());
+
                 ServerLogger logger = new ServerLogger(filename);
                 client.addObserver(logger);
             }
             parent.connectToServer(client);
+        } catch (ClientAlreadyExistsException e) {
+            JOptionPane.showMessageDialog(this, "A client on this sever at this port already exists", "Cient Already Exists", JOptionPane.ERROR_MESSAGE);
+            return;
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "The Port has to be a number", "Invalid Port", JOptionPane.ERROR_MESSAGE);
             return;
@@ -333,8 +349,26 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_browseButtonActionPerformed
 
+    private SimpleDateFormat dateFormat;
+
     private String formatFilename(String filename) {
-        filename = filename.replaceAll("<time>", ""+System.currentTimeMillis());
+        // Remove Path Seperator at beginning of filename
+        char firstChar = filename.charAt(0);
+        if (firstChar == '/' || firstChar == '\\') {
+            filename = filename.replaceFirst(""+firstChar, "");
+        }
+
+        Date date = new Date();
+        dateFormat = new SimpleDateFormat();
+        int sml = filename.indexOf('<'), grt = filename.indexOf('>');
+        while (sml != -1 && grt != -1){
+            String parsePattern = filename.substring(sml+1, grt);
+            dateFormat.applyPattern(parsePattern);
+            String formatted = dateFormat.format(date);
+            filename = filename.replaceAll("<"+parsePattern+">", formatted);
+            sml = filename.indexOf('<');
+            grt = filename.indexOf('>');
+        }
 
         return filename;
     }
