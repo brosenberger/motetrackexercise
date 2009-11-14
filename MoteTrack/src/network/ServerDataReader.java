@@ -3,39 +3,44 @@ package network;
 import java.util.HashMap;
 
 import data.SensorData;
+import exceptions.ClientAlreadyExistsException;
 import java.util.ArrayList;
 import java.util.List;
 import listener.ServerDataListener;
 
 public class ServerDataReader extends ServerReader {
-    String ids;
-    HashMap<String, Object> map;
+    private String ids;
+    private HashMap<String, Object> map;
+    private static HashMap<String, ServerDataReader> serverDataReaders = new HashMap<String, ServerDataReader>();
 
     private List<ServerDataListener> listeners;
     private boolean filterIds;
-    public ServerDataReader(String srv, int port) {
-        super(srv, port);
-        filterIds = false;
-
-        listeners = new ArrayList<ServerDataListener>();
+    public ServerDataReader(String srv, int port) throws ClientAlreadyExistsException {
+        this(srv, port, null);
     }
 
-    public ServerDataReader(String srv, int port, String ids) {
-            super(srv, port);
-            listeners = new ArrayList<ServerDataListener>();
+    public ServerDataReader(String srv, int port, String ids) throws ClientAlreadyExistsException {
+        super(srv, port);
+        String adr = srv+":"+port;
+        if (serverDataReaders.containsKey(adr)) {
+            throw new ClientAlreadyExistsException(serverDataReaders.get(adr));
+        }
+        listeners = new ArrayList<ServerDataListener>();
 
-            if (ids == null || ids.length() == 0) {
-                filterIds = false;
-            } else {
-                String[] splitIds = ids.split(";");
-                map = new HashMap<String, Object>();
-                for (int i=0;i<splitIds.length;i++) {
-                        String id = splitIds[i];
-                        map.put(id, "");
-                }
-
-                filterIds = true;
+        if (ids == null || ids.length() == 0) {
+            filterIds = false;
+        } else {
+            String[] splitIds = ids.split(";");
+            map = new HashMap<String, Object>();
+            for (int i=0;i<splitIds.length;i++) {
+                    String id = splitIds[i];
+                    map.put(id, "");
             }
+
+            filterIds = true;
+        }
+
+        serverDataReaders.put(srv+":"+port, this);
     }
 
     @Override

@@ -8,9 +8,12 @@ public class IllegalTagIdFormatException extends Exception{
 
     private String illegalId;
 
-    public IllegalTagIdFormatException() {}
+    public IllegalTagIdFormatException() {
+        super();
+    }
 
     public IllegalTagIdFormatException(String id) {
+        this();
         illegalId = id;
     }
 

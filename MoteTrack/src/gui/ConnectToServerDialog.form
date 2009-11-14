@@ -239,7 +239,7 @@
     </Component>
     <Component class="javax.swing.JTextField" name="filenameTextField">
       <Properties>
-        <Property name="text" type="java.lang.String" value="&lt;time&gt;.txt"/>
+        <Property name="text" type="java.lang.String" value="&lt;yy&apos;.&apos;MM&apos;.&apos;dd kk&apos;-&apos;mm&apos;-&apos;ss&gt;.log"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
     </Component>

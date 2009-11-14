@@ -317,6 +317,7 @@ public class MoteTrackApp extends JFrame {
     public void connectToServer(ServerDataReader client) {
         System.out.println("connect to server");
         client.startReader();
+
         historyCollector = new HistoryCollector(client);
         ((TagIdListModel) tagIdList.getModel()).setHistorycollector(historyCollector);
     }
