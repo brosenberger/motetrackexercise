@@ -1,6 +1,6 @@
 package exceptions;
 
-import network.ServerDataReader;
+import network.ServerReader;
 
 /**
  *
@@ -8,14 +8,14 @@ import network.ServerDataReader;
  */
 public class ClientAlreadyExistsException extends Exception{
 
-    private ServerDataReader client;
+    private ServerReader client;
 
-    public ClientAlreadyExistsException(ServerDataReader client) {
+    public ClientAlreadyExistsException(ServerReader client) {
         super();
         this.client = client;
     }
 
-    public ServerDataReader getClient() {
+    public ServerReader getClient() {
         return client;
     }
 

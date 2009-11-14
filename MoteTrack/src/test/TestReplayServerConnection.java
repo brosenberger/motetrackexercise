@@ -1,10 +1,11 @@
 package test;
 
+import exceptions.ClientAlreadyExistsException;
 import network.ServerDataReader;
 import misc.ServerLogger;
 
 public class TestReplayServerConnection {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ClientAlreadyExistsException {
 		System.out.println("Starting client");
 		String fileName = "logs/ReplayLog"+System.currentTimeMillis()+".txt";
 		System.out.println("Writing results to "+fileName);

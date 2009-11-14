@@ -11,10 +11,12 @@
 
 package gui;
 
+import data.HistoryCollector;
 import data.Position;
 import data.SensorData;
 import exceptions.ClientAlreadyExistsException;
 import exceptions.IllegalTagIdFormatException;
+import java.awt.Component;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -25,10 +27,12 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataListener;
+import listener.ConnectionListener;
 import misc.ServerLogger;
 import misc.SimpleListModel;
 import network.NormalizedServerDataReader;
 import network.ServerDataReader;
+import network.ServerReader;
 
 /**
  *
@@ -38,6 +42,9 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
 
     private SimpleListModel simpleListModel;
     private MoteTrackApp parent;
+    private boolean connectionEstablished;
+    private ServerDataReader client;
+    private ConnectToServerDialog ctsd;
 
     /** Creates new form ConnectToServerDialog */
     public ConnectToServerDialog(MoteTrackApp parent, boolean modal) {
@@ -45,8 +52,8 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         simpleListModel = new SimpleListModel();
         this.parent = parent;
         initComponents();
-        
-
+        connectionEstablished = false;
+        ctsd = this;
     }
 
     /** This method is called from within the constructor to
@@ -164,41 +171,40 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(replayLogLabel, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(tagIdTextField)
+                            .addComponent(tagIdListScrollPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(replayLogLabel, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(tagIdTextField)
-                                    .addComponent(tagIdListScrollPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(addButton)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(removeButton))
-                                    .addComponent(serverAddressTextField, javax.swing.GroupLayout.Alignment.LEADING))
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(53, 53, 53)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(logCheckBox)
-                                            .addComponent(pathLabel)
-                                            .addComponent(normalizeCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
-                                            .addComponent(pathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addGap(52, 52, 52)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(filenameLabel)
-                                            .addComponent(browseButton)
-                                            .addComponent(filenameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                            .addComponent(idLabel)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(54, 54, 54)
-                        .addComponent(connectButton)
-                        .addGap(18, 18, 18)
-                        .addComponent(abortButton)))
+                                .addComponent(addButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(removeButton))
+                            .addComponent(serverAddressTextField, javax.swing.GroupLayout.Alignment.LEADING))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(53, 53, 53)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(logCheckBox)
+                                    .addComponent(pathLabel)
+                                    .addComponent(normalizeCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(52, 52, 52)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(filenameLabel)
+                                    .addComponent(browseButton)
+                                    .addComponent(filenameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
+                                    .addComponent(pathTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(connectButton)
+                                .addGap(18, 18, 18)
+                                .addComponent(abortButton)
+                                .addGap(41, 41, 41))))
+                    .addComponent(idLabel))
                 .addContainerGap())
         );
 
@@ -207,28 +213,11 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(replayLogLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(serverAddressTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(idLabel)
-                        .addGap(6, 6, 6))
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(27, 27, 27)
                         .addComponent(normalizeCheckBox)
-                        .addGap(23, 23, 23)))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(tagIdListScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(16, 16, 16)
-                        .addComponent(tagIdTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(removeButton)
-                            .addComponent(addButton)))
-                    .addGroup(layout.createSequentialGroup()
+                        .addGap(23, 23, 23)
                         .addComponent(logCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(pathLabel)
@@ -239,12 +228,25 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(filenameLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(filenameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(connectButton)
-                    .addComponent(abortButton))
-                .addContainerGap())
+                        .addComponent(filenameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(replayLogLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(serverAddressTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(idLabel)
+                        .addGap(6, 6, 6)
+                        .addComponent(tagIdListScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(16, 16, 16)
+                        .addComponent(tagIdTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(removeButton)
+                            .addComponent(addButton)
+                            .addComponent(connectButton)
+                            .addComponent(abortButton))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -269,11 +271,11 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
 
         try {
             int port = Integer.parseInt(split[1]);
-            ServerDataReader client = new ServerDataReader(address, port, ids);
+            ServerDataReader newClient = new ServerDataReader(address, port, ids);
             if (normalizeCheckBox.isSelected()) {
                 Position pos = new Position(0.15, 0.15, 0.15);
                 NormalizedServerDataReader obs = new NormalizedServerDataReader(pos, 1);
-                client.addObserver(obs);
+                newClient.addObserver(obs);
             }
 
             if (logCheckBox.isSelected()) {
@@ -285,11 +287,34 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
                 }
 
                 String filename = path + formatFilename(filenameTextField.getText());
-
+                File file = new File(filename);
                 ServerLogger logger = new ServerLogger(filename);
-                client.addObserver(logger);
+                if (file.exists()) {
+                    int answer = JOptionPane.showConfirmDialog(this, "File already exists - Override?", "File Already Exists", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if (answer == JOptionPane.YES_OPTION) {
+                        newClient.addObserver(logger);
+                    }
+                } else {
+                    newClient.addObserver(logger);
+                }
             }
-            parent.connectToServer(client);
+
+            if (client != null) {
+                int answer = showYesNoDialog("Already connect to a Server. Connection will be closed.\nProceed?", "Already Connected");
+                if (answer == JOptionPane.NO_OPTION) {
+                    return;
+                }
+
+                client.removeConnectionListener(connectionListener);
+                client.stopReader();
+            }
+
+            newClient.addConnectionListener(connectionListener);
+            newClient.startReader();
+            client = newClient;
+//            if (!connectionEstablished) {
+//                return;
+//            }
         } catch (ClientAlreadyExistsException e) {
             JOptionPane.showMessageDialog(this, "A client on this sever at this port already exists", "Cient Already Exists", JOptionPane.ERROR_MESSAGE);
             return;
@@ -297,8 +322,6 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
             JOptionPane.showMessageDialog(this, "The Port has to be a number", "Invalid Port", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
-        dispose();
     }//GEN-LAST:event_connectButtonActionPerformed
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
@@ -307,7 +330,7 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
             String tagId = SensorData.formatId(tagIdTextField.getText(), false);
             simpleListModel.addElement(tagId);
         } catch (IllegalTagIdFormatException e) {
-            JOptionPane.showMessageDialog(this, "You entered an invalid Tag ID", "Invalid Tag ID", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "You entered an invalid Tag ID - "+e.getIllegalTagId(), "Invalid Tag ID", JOptionPane.ERROR_MESSAGE);
         }
         
     }//GEN-LAST:event_addButtonActionPerformed
@@ -373,6 +396,26 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         return filename;
     }
 
+    private void showErrorDialog(String msg, String title) {
+        showErrorDialog(this, msg, title);
+    }
+
+    private void showErrorDialog(Component comp, String msg, String title) {
+        JOptionPane.showMessageDialog(comp, msg, title, JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void showInformationDialog(String msg, String title) {
+        showInformationDialog(this, msg, title);
+    }
+
+    private void showInformationDialog(Component comp, String msg, String title) {
+        JOptionPane.showMessageDialog(comp, msg, title, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private int showYesNoDialog(String msg, String title) {
+        return JOptionPane.showConfirmDialog(this, msg, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+    }
+
     /**
     * @param args the command line arguments
     */
@@ -411,4 +454,31 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
     private javax.swing.JTextField tagIdTextField;
     // End of variables declaration//GEN-END:variables
 
+
+    private ConnectionListener connectionListener = new ConnectionListener() {
+
+        public void connectionStateChanged(ServerReader source, boolean connected, boolean intended) {
+            connectionEstablished = connected;
+
+            if (!intended) {
+                showErrorDialog("Connection failed", "Connection Failed");
+                client = null;
+                return;
+            }
+            
+            if (connected) {
+                showInformationDialog("Connection to server established", "Connection Established");
+                parent.connectToServer(client, new HistoryCollector(client));
+                ctsd.dispose();
+            } else {
+                showInformationDialog("Disconnected from server", "Server Disconnected");
+                client = null;
+            }
+        }
+
+        public void unknownHost(ServerReader source, String host) {
+            showErrorDialog("Unknown host: "+host, "Unknown Host");
+            client = null;
+        }
+    };
 }

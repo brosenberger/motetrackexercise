@@ -59,14 +59,15 @@ public class MoteTrackApp extends JFrame {
     
     private Animator animator;
     private DataVisualisation renderer;
+    private ServerDataReader client;
     private HistoryCollector historyCollector;
-    private StartServerDialog startServerDialog;
+    private StartReplayServerDialog startServerDialog;
     private ConnectToServerDialog connectToServerDialog;
 
     /** Creates new form MainFrame */
     public MoteTrackApp() {
 
-        startServerDialog = new StartServerDialog(this, true);
+        startServerDialog = new StartReplayServerDialog(this, true);
         connectToServerDialog = new ConnectToServerDialog(this, true);
 
         initComponents();
@@ -125,8 +126,8 @@ public class MoteTrackApp extends JFrame {
         tagIdListScrollPane = new JScrollPane();
         tagIdList = new JList();
         jMenuBar1 = new JMenuBar();
-        fileMenuItem = new JMenu();
-        startServerItem = new JMenuItem();
+        fileMenu = new JMenu();
+        startReplayServerItem = new JMenuItem();
         connectMenuItem = new JMenuItem();
         exitMenuItem = new JMenuItem();
 
@@ -160,15 +161,15 @@ public class MoteTrackApp extends JFrame {
         tagIdList.setModel(new TagIdListModel());
         tagIdListScrollPane.setViewportView(tagIdList);
 
-        fileMenuItem.setText("File");
+        fileMenu.setText("File");
 
-        startServerItem.setText("Start Server");
-        startServerItem.addActionListener(new ActionListener() {
+        startReplayServerItem.setText("Start Replay Server");
+        startReplayServerItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                startServerItemActionPerformed(evt);
+                startReplayServerItemActionPerformed(evt);
             }
         });
-        fileMenuItem.add(startServerItem);
+        fileMenu.add(startReplayServerItem);
 
         connectMenuItem.setText("Connect to Server");
         connectMenuItem.addActionListener(new ActionListener() {
@@ -176,13 +177,13 @@ public class MoteTrackApp extends JFrame {
                 connectMenuItemActionPerformed(evt);
             }
         });
-        fileMenuItem.add(connectMenuItem);
+        fileMenu.add(connectMenuItem);
 
         exitMenuItem.setAction(exitAction);
         exitMenuItem.setText("Exit");
-        fileMenuItem.add(exitMenuItem);
+        fileMenu.add(exitMenuItem);
 
-        jMenuBar1.add(fileMenuItem);
+        jMenuBar1.add(fileMenu);
 
         setJMenuBar(jMenuBar1);
 
@@ -237,10 +238,10 @@ public class MoteTrackApp extends JFrame {
         renderer.reset();
     }//GEN-LAST:event_resetButtonActionPerformed
 
-    private void startServerItemActionPerformed(ActionEvent evt) {//GEN-FIRST:event_startServerItemActionPerformed
+    private void startReplayServerItemActionPerformed(ActionEvent evt) {//GEN-FIRST:event_startReplayServerItemActionPerformed
         startServerDialog.setLocationRelativeTo(this);
         startServerDialog.setVisible(true);
-    }//GEN-LAST:event_startServerItemActionPerformed
+    }//GEN-LAST:event_startReplayServerItemActionPerformed
 
     private void connectMenuItemActionPerformed(ActionEvent evt) {//GEN-FIRST:event_connectMenuItemActionPerformed
         connectToServerDialog.setLocationRelativeTo(this);
@@ -314,11 +315,9 @@ public class MoteTrackApp extends JFrame {
         }
     };
 
-    public void connectToServer(ServerDataReader client) {
-        System.out.println("connect to server");
-        client.startReader();
-
-        historyCollector = new HistoryCollector(client);
+    public void connectToServer(ServerDataReader client, HistoryCollector historyCollector) {
+        this.client = client;
+        this.historyCollector = historyCollector;
         ((TagIdListModel) tagIdList.getModel()).setHistorycollector(historyCollector);
     }
 
@@ -328,11 +327,11 @@ public class MoteTrackApp extends JFrame {
     private GLCanvas canvas;
     private JMenuItem connectMenuItem;
     private JMenuItem exitMenuItem;
-    private JMenu fileMenuItem;
+    private JMenu fileMenu;
     private JCheckBox historyCheckBox;
     private JMenuBar jMenuBar1;
     private JButton resetButton;
-    private JMenuItem startServerItem;
+    private JMenuItem startReplayServerItem;
     private JList tagIdList;
     private JScrollPane tagIdListScrollPane;
     // End of variables declaration//GEN-END:variables
