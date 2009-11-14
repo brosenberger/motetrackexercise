@@ -22,14 +22,20 @@ public class ServerDataReader extends ServerReader {
 
     public ServerDataReader(String srv, int port, String ids) {
             super(srv, port);
-            String[] splitIds = ids.split(";");
-            map = new HashMap<String, Object>();
-            for (int i=0;i<splitIds.length;i++) {
-                    String id = splitIds[i];
-                    map.put(id, "");
-            }
             listeners = new ArrayList<ServerDataListener>();
-            filterIds = true;
+
+            if (ids == null || ids.length() == 0) {
+                filterIds = false;
+            } else {
+                String[] splitIds = ids.split(";");
+                map = new HashMap<String, Object>();
+                for (int i=0;i<splitIds.length;i++) {
+                        String id = splitIds[i];
+                        map.put(id, "");
+                }
+
+                filterIds = true;
+            }
     }
 
     @Override

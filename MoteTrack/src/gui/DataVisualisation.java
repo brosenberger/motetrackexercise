@@ -36,10 +36,6 @@ public class DataVisualisation implements GLEventListener {
 
     public void setSelectedTagIds(ArrayList<String> list) {
         selectedTagIds = list;
-        System.out.println("selected tag ids changed");
-        for (String s : list) {
-            System.out.println(s);
-        }
     }
     
     public void init(GLAutoDrawable drawable) {
