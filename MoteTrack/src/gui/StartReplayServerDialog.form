@@ -56,7 +56,7 @@
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="51" max="-2" attributes="0"/>
-                      <Component id="connectButton" min="-2" max="-2" attributes="0"/>
+                      <Component id="startServerButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
                       <Component id="abortButton" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -87,7 +87,7 @@
               </Group>
               <EmptySpace pref="11" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="connectButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="startServerButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="abortButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -96,12 +96,12 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JButton" name="connectButton">
+    <Component class="javax.swing.JButton" name="startServerButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Start"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="connectButtonActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="startServerButtonActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="abortButton">
@@ -147,7 +147,7 @@
     </Component>
     <Component class="javax.swing.JTextField" name="rateTextField">
       <Properties>
-        <Property name="text" type="java.lang.String" value="1000"/>
+        <Property name="text" type="java.lang.String" value="100"/>
       </Properties>
     </Component>
   </SubComponents>

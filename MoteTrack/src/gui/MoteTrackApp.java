@@ -7,6 +7,12 @@
 package gui;
 
 import exceptions.IllegalTagIdFormatException;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import javax.swing.JSpinner;
+import javax.swing.KeyStroke;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import com.sun.opengl.util.Animator;
 import data.HistoryCollector;
@@ -64,11 +70,18 @@ public class MoteTrackApp extends JFrame {
     private StartReplayServerDialog startServerDialog;
     private ConnectToServerDialog connectToServerDialog;
 
+    private void autoStartReplayServer() {
+        startServerDialog.startServer();
+    }
+
     /** Creates new form MainFrame */
     public MoteTrackApp() {
 
         startServerDialog = new StartReplayServerDialog(this, true);
         connectToServerDialog = new ConnectToServerDialog(this, true);
+
+        // for debugging only
+       // autoStartReplayServer();
 
         initComponents();
 
@@ -118,22 +131,26 @@ public class MoteTrackApp extends JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        JLabel label = new JLabel();
+        JLabel tagIdListLabel = new JLabel();
         canvas = new GLCanvas(createGLCapabilites());
         historyCheckBox = new JCheckBox();
         beacon2dCheckBox = new JCheckBox();
         resetButton = new JButton();
         tagIdListScrollPane = new JScrollPane();
         tagIdList = new JList();
+        planeCheckBox = new JCheckBox();
+        tagSizeSpinner = new JSpinner();
+        tagSizeLabel = new JLabel();
         jMenuBar1 = new JMenuBar();
         fileMenu = new JMenu();
         startReplayServerItem = new JMenuItem();
         connectMenuItem = new JMenuItem();
+        connectTagsMenuItem = new JMenuItem();
         exitMenuItem = new JMenuItem();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        label.setText("Below you see a GLCanvas");
+        tagIdListLabel.setText("List of Tag IDs");
 
         historyCheckBox.setSelected(true);
         historyCheckBox.setText("draw history");
@@ -161,6 +178,22 @@ public class MoteTrackApp extends JFrame {
         tagIdList.setModel(new TagIdListModel());
         tagIdListScrollPane.setViewportView(tagIdList);
 
+        planeCheckBox.setText("show Plane");
+        planeCheckBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                planeCheckBoxActionPerformed(evt);
+            }
+        });
+
+        tagSizeSpinner.setValue(new Integer(2));
+        tagSizeSpinner.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent evt) {
+                tagSizeSpinnerStateChanged(evt);
+            }
+        });
+
+        tagSizeLabel.setText("Tag drawing size (dm)");
+
         fileMenu.setText("File");
 
         startReplayServerItem.setText("Start Replay Server");
@@ -179,7 +212,11 @@ public class MoteTrackApp extends JFrame {
         });
         fileMenu.add(connectMenuItem);
 
+        connectTagsMenuItem.setText("Connect Tags");
+        fileMenu.add(connectTagsMenuItem);
+
         exitMenuItem.setAction(exitAction);
+        exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_MASK));
         exitMenuItem.setText("Exit");
         fileMenu.add(exitMenuItem);
 
@@ -194,7 +231,7 @@ public class MoteTrackApp extends JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(label)
+                    .addComponent(tagIdListLabel)
                     .addComponent(tagIdListScrollPane, GroupLayout.PREFERRED_SIZE, 146, GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(Alignment.LEADING)
@@ -203,7 +240,13 @@ public class MoteTrackApp extends JFrame {
                         .addComponent(historyCheckBox)
                         .addPreferredGap(ComponentPlacement.UNRELATED)
                         .addComponent(beacon2dCheckBox)
-                        .addPreferredGap(ComponentPlacement.RELATED, 282, Short.MAX_VALUE)
+                        .addPreferredGap(ComponentPlacement.RELATED)
+                        .addComponent(planeCheckBox)
+                        .addPreferredGap(ComponentPlacement.UNRELATED)
+                        .addComponent(tagSizeSpinner, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(ComponentPlacement.RELATED)
+                        .addComponent(tagSizeLabel)
+                        .addPreferredGap(ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
                         .addComponent(resetButton)))
                 .addContainerGap())
         );
@@ -212,10 +255,13 @@ public class MoteTrackApp extends JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(label)
+                    .addComponent(tagIdListLabel)
                     .addComponent(historyCheckBox)
                     .addComponent(beacon2dCheckBox)
-                    .addComponent(resetButton))
+                    .addComponent(resetButton)
+                    .addComponent(planeCheckBox)
+                    .addComponent(tagSizeSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tagSizeLabel))
                 .addPreferredGap(ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(Alignment.LEADING)
                     .addComponent(tagIdListScrollPane, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
@@ -247,6 +293,14 @@ public class MoteTrackApp extends JFrame {
         connectToServerDialog.setLocationRelativeTo(this);
         connectToServerDialog.setVisible(true);
     }//GEN-LAST:event_connectMenuItemActionPerformed
+
+    private void planeCheckBoxActionPerformed(ActionEvent evt) {//GEN-FIRST:event_planeCheckBoxActionPerformed
+        renderer.setDrawPlane(planeCheckBox.isSelected());
+    }//GEN-LAST:event_planeCheckBoxActionPerformed
+
+    private void tagSizeSpinnerStateChanged(ChangeEvent evt) {//GEN-FIRST:event_tagSizeSpinnerStateChanged
+        renderer.setTagSize(Double.parseDouble(tagSizeSpinner.getValue().toString())/10);
+    }//GEN-LAST:event_tagSizeSpinnerStateChanged
 
     /**
      * Called from within initComponents().
@@ -326,14 +380,18 @@ public class MoteTrackApp extends JFrame {
     private JCheckBox beacon2dCheckBox;
     private GLCanvas canvas;
     private JMenuItem connectMenuItem;
+    private JMenuItem connectTagsMenuItem;
     private JMenuItem exitMenuItem;
     private JMenu fileMenu;
     private JCheckBox historyCheckBox;
     private JMenuBar jMenuBar1;
+    private JCheckBox planeCheckBox;
     private JButton resetButton;
     private JMenuItem startReplayServerItem;
     private JList tagIdList;
     private JScrollPane tagIdListScrollPane;
+    private JLabel tagSizeLabel;
+    private JSpinner tagSizeSpinner;
     // End of variables declaration//GEN-END:variables
 
 }
