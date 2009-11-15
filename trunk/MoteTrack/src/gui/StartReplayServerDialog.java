@@ -36,7 +36,7 @@ public class StartReplayServerDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        connectButton = new javax.swing.JButton();
+        startServerButton = new javax.swing.JButton();
         abortButton = new javax.swing.JButton();
         replayLogTextField = new javax.swing.JTextField();
         replayLogLabel = new javax.swing.JLabel();
@@ -53,10 +53,10 @@ public class StartReplayServerDialog extends javax.swing.JDialog {
         setName("connectDialog"); // NOI18N
         setResizable(false);
 
-        connectButton.setText("Start");
-        connectButton.addActionListener(new java.awt.event.ActionListener() {
+        startServerButton.setText("Start");
+        startServerButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                connectButtonActionPerformed(evt);
+                startServerButtonActionPerformed(evt);
             }
         });
 
@@ -84,7 +84,7 @@ public class StartReplayServerDialog extends javax.swing.JDialog {
 
         portTextField.setText("5000");
 
-        rateTextField.setText("1000");
+        rateTextField.setText("100");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -111,7 +111,7 @@ public class StartReplayServerDialog extends javax.swing.JDialog {
                             .addComponent(rateLabel)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(51, 51, 51)
-                        .addComponent(connectButton)
+                        .addComponent(startServerButton)
                         .addGap(28, 28, 28)
                         .addComponent(abortButton)))
                 .addContainerGap())
@@ -135,7 +135,7 @@ public class StartReplayServerDialog extends javax.swing.JDialog {
                     .addComponent(rateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(connectButton)
+                    .addComponent(startServerButton)
                     .addComponent(abortButton))
                 .addContainerGap())
         );
@@ -159,14 +159,20 @@ public class StartReplayServerDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_browseButtonActionPerformed
 
-    private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
+    private void startServerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startServerButtonActionPerformed
+        startServer();
+        dispose();
+    }//GEN-LAST:event_startServerButtonActionPerformed
+
+
+    // for autostart of server protected
+    protected void startServer() {
         String filename = replayLogTextField.getText();
         int rate = Integer.parseInt(rateTextField.getText());
         int port = Integer.parseInt(portTextField.getText());
-        
+
         new ReplayServer(filename, rate, port);
-        dispose();
-    }//GEN-LAST:event_connectButtonActionPerformed
+    }
 
     /**
     * @param args the command line arguments
@@ -189,13 +195,13 @@ public class StartReplayServerDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton abortButton;
     private javax.swing.JButton browseButton;
-    private javax.swing.JButton connectButton;
     private javax.swing.JLabel portLabel;
     private javax.swing.JTextField portTextField;
     private javax.swing.JLabel rateLabel;
     private javax.swing.JTextField rateTextField;
     private javax.swing.JLabel replayLogLabel;
     private javax.swing.JTextField replayLogTextField;
+    private javax.swing.JButton startServerButton;
     // End of variables declaration//GEN-END:variables
 
 }

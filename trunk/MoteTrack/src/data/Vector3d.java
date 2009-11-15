@@ -124,8 +124,21 @@ public class Vector3d {
         return z;
     }
 
+    /** returns new vector
+     * 
+     * @param d
+     *      the scalar to multiply with
+     * @param v
+     *      the vector to be mutliplied with param d
+     * @return
+     *      a new vector that has d-times the length of v
+     */
     public static Vector3d scalarTimesVector(double d, Vector3d v) {
         return new Vector3d(d*v.x, d*v.y, d*v.z);
+    }
+
+    public static Vector3d normalizeVector(Vector3d v) {
+        return scalarTimesVector(1/v.getLength(), v);
     }
 
     @Override

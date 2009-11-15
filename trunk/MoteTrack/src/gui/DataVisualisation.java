@@ -31,16 +31,27 @@ import javax.media.opengl.glu.GLU;
  */
 public class DataVisualisation implements GLEventListener {
 
-    private boolean drawHistory = true, draw2dBeacon = true;
+    private boolean drawHistory = true, draw2dBeacon = true, drawPlane = false;
     private ArrayList<String> selectedTagIds;
+    private double tagSize = 0.2;
+
+    public void setTagSize(double size) {
+        tagSize = size;
+    }
 
     public void setSelectedTagIds(ArrayList<String> list) {
         selectedTagIds = list;
     }
+
+    public void setDrawPlane(boolean drawPlane) {
+        this.drawPlane = drawPlane;
+    }
     
     public void init(GLAutoDrawable drawable) {
-        absolutPosition = new Vector3d(0, 0, 0);
-        absolutDirection = new Vector3d(0, 0, 1);
+        strafe = new Vector3d(-1,0,0);
+        strafeCorr = new Vector3d(-1, 0, 0);
+        absolutePosition = new Vector3d(0, 0, 0);
+        absoluteDirection = new Vector3d(0, 0, 1);
         selectedTagIds = new ArrayList<String>();
         // Use debug pipeline
         // drawable.setGL(new DebugGL(drawable.getGL()));
@@ -81,12 +92,12 @@ public class DataVisualisation implements GLEventListener {
         gl.glLoadIdentity();
     }
 
-    private Vector3d absolutPosition;
-    private Vector3d absolutDirection;
+    private Vector3d absolutePosition;
+    private Vector3d absoluteDirection;
 
 
     private void moveAbsolute(GL gl) {
-        gl.glTranslated(absolutPosition.getX(), absolutPosition.getY(), absolutPosition.getZ());
+        gl.glTranslated(absolutePosition.getX(), absolutePosition.getY(), absolutePosition.getZ());
 //        System.out.println("pos: "+absolutPosition);
     }
 
@@ -97,12 +108,12 @@ public class DataVisualisation implements GLEventListener {
     }
 
     private void resetAbsoluteValues() {
-        absolutDirection = new Vector3d(0, 0, 1);
-        absolutPosition =  new Vector3d(0, 0, 0);
+        absoluteDirection = new Vector3d(0, 0, 1);
+        absolutePosition =  new Vector3d(0, 0, 0);
     }
 
     public void reset() {
-        old_x = old_y = old_z = move_x = move_y = move_z = 0;
+        old_x = old_y = oldMoveForward = moveStrafe = move_y = moveForward = 0;
         view_rotx = view_roty = view_rotz = old_rotx = old_roty = old_rotz = 0;
         resetAbsoluteValues();
     }
@@ -119,22 +130,26 @@ public class DataVisualisation implements GLEventListener {
         
         gl.glPushMatrix();
 
+
         // MOVING VIEWPOINT //
 
         rotate(view_rotx, view_roty, view_rotz, gl);
         gl.glTranslated(-old_rotx, -old_roty, -old_rotz);
-        gl.glTranslated(move_x, move_y, 0);
+        gl.glTranslated(0, move_y, 0);
         gl.glTranslated(old_rotx, old_roty, old_rotz);
         moveAbsolute(gl);
 
-
-        gl.glRotated(20, 1, 0, 0);
-        gl.glRotated(25, 0, 1,0);
-        gl.glTranslated(0 , -5, -10);
+//        gl.glRotated(20, 1, 0, 0);
+//        gl.glRotated(25, 0, 1,0);
+        gl.glTranslated(0 , -1.8, -10);
         gl.glRotated(-90, 1, 0, 0);
         gl.glTranslated(-7, -3.5, 0);
 
         // END OF MOVING VIEWPOINT //
+
+
+
+        
 
         // DRAW THE SCENE
         
@@ -151,10 +166,10 @@ public class DataVisualisation implements GLEventListener {
                 //gl.glPopMatrix();
             }
         }
-        
+
+        setDrawingColor(gl, Color.GREEN);
         // Draw Cell1 Base
         gl.glBegin(GL.GL_LINE_LOOP);
-            gl.glColor3d(1, 1, 1);
             gl.glVertex3d( 8.028, 0.440, 0);
             gl.glVertex3d(14.298, 0.890, 0);
             gl.glVertex3d(12.558, 6.890, 0);
@@ -162,17 +177,15 @@ public class DataVisualisation implements GLEventListener {
         gl.glEnd();
 
         // Draw Cell1
-        gl.glBegin(GL.GL_LINE_LOOP);
-            setDrawingColor(gl, Color.GREEN);
-            gl.glVertex3d( 8.028, 0.440, 2.270);
-            gl.glVertex3d(14.298, 0.890, 2.250);
-            gl.glVertex3d(12.558, 6.890, 2.260);
-            gl.glVertex3d( 9.008, 6.910, 2.240);
-        gl.glEnd();
+//        gl.glBegin(GL.GL_LINE_LOOP);
+//            gl.glVertex3d( 8.028, 0.440, 2.270);
+//            gl.glVertex3d(14.298, 0.890, 2.250);
+//            gl.glVertex3d(12.558, 6.890, 2.260);
+//            gl.glVertex3d( 9.008, 6.910, 2.240);
+//        gl.glEnd();
 
         // Draw Cell2 Base
         gl.glBegin(GL.GL_LINE_LOOP);
-            gl.glColor3d(1, 1, 1);
             gl.glVertex3d(0.436, 0.720, 0);
             gl.glVertex3d(6.295, 0.515, 0);
             gl.glVertex3d(6.744, 3.404, 0);
@@ -180,17 +193,31 @@ public class DataVisualisation implements GLEventListener {
         gl.glEnd();
 
         // Draw Cell2
-        gl.glBegin(GL.GL_LINE_LOOP);
-            gl.glColor3d(0, 1, 0);
-            gl.glVertex3d(0.436, 0.720, 2.250);
-            gl.glVertex3d(6.295, 0.515, 2.286);
-            gl.glVertex3d(6.744, 3.404, 2.305);
-            gl.glVertex3d(0.512, 3.306, 2.271);
-        gl.glEnd();
-        
+//        gl.glBegin(GL.GL_LINE_LOOP);
+//            gl.glVertex3d(0.436, 0.720, 2.250);
+//            gl.glVertex3d(6.295, 0.515, 2.286);
+//            gl.glVertex3d(6.744, 3.404, 2.305)8+f
+//            gl.glVertex3d(0.512, 3.306, 2.271);
+//        gl.glEnd();
+
+        // Draw Room 1
+        drawWireCube(new Position(7.06, 3.478, 3.5), Color.WHITE, gl);
+
+        // Draw Room 2
+        gl.glPushMatrix();
+        gl.glTranslated(7.56, 0, 0);
+        drawWireCube(new Position(7.308, 7.32, 3.5), Color.WHITE, gl);
+
+        gl.glPopMatrix();
+
         // Draw Coordinate Axes
         drawCoordinateAxes(gl);
 
+
+        if (drawPlane) {
+            drawWirePlane(50, 50, 0, 25, 25, Color.WHITE, gl);
+        }
+        
         zoom(zoom, gl);
 
         // Remember that every push needs a pop; this one is paired with
@@ -199,6 +226,100 @@ public class DataVisualisation implements GLEventListener {
 
         // Flush all drawing operations to the graphics card
         gl.glFlush();
+    }
+
+    private void drawStrafingInfo(GL gl) {
+        gl.glBegin(GL.GL_LINES);
+            setDrawingColor(gl, Color.PINK);
+            gl.glVertex3d(-absoluteDirection.getX(), absoluteDirection.getZ(), -absoluteDirection.getY());
+            gl.glVertex3d(0, 0, 0);
+            setDrawingColor(gl, Color.yellow);
+            gl.glVertex3d(-strafe.getX(), strafe.getZ(), -strafe.getY());
+            gl.glVertex3d(0, 0, 0);
+            setDrawingColor(gl, Color.ORANGE);
+            gl.glVertex3d(-strafeCorr.getX(), strafeCorr.getZ(), -strafeCorr.getY());
+            gl.glVertex3d(0, 0, 0);
+        gl.glEnd();
+    }
+
+    private void drawWirePlane(double width, double depth, double z, int splitX, int splitY, Color color, GL gl) {
+        setDrawingColor(gl, color);
+        double widthHalf = width/2;
+        double depthHalf = depth/2;
+        double x = -widthHalf;
+        double y = depthHalf;
+        double xAdd = width/splitX;
+        double yAdd = depth/splitY;
+
+        gl.glBegin(GL.GL_LINES);
+        
+        while (x <= widthHalf) {
+            gl.glVertex3d(x, y, z);
+            gl.glVertex3d(x, -y, z);
+            x += xAdd;
+        }
+
+        x = widthHalf;
+
+        while (y >= -depthHalf) {
+            gl.glVertex3d(x, y, z);
+            gl.glVertex3d(-x, y, z);
+            y -= yAdd;
+        }
+        
+        gl.glEnd();
+    }
+
+    private void drawWireCube(Position from, Position to, Color color, GL gl) {
+        gl.glPushMatrix();
+
+        double from_x = from.getX(), from_y = from.getY(), from_z = from.getZ();
+        double to_x = to.getX() - from_x;
+        double to_y = to.getY() - from_y;
+        double to_z = to.getZ() - from_z;
+
+        gl.glTranslated(from_x, from_y, from_z);
+        drawWireCube(new Position(to_x, to_y, to_z), color, gl);
+
+        gl.glPopMatrix();
+    }
+
+    // draws a wired cube from (0, 0, 0) to (Pos.x, Pos.y, Pos.z)
+    private void drawWireCube(Position pos, Color color, GL gl) {
+        double x = pos.getX(), y = pos.getY(), z = pos.getZ();
+
+        setDrawingColor(gl, color);
+
+        // draw floor (front)
+        gl.glBegin(GL.GL_LINE_LOOP);
+            gl.glVertex3d(0, 0, 0);
+            gl.glVertex3d(x, 0, 0);
+            gl.glVertex3d(x, y, 0);
+            gl.glVertex3d(0, y, 0);
+        gl.glEnd();
+
+        // draw ceiling (back)
+        gl.glBegin(GL.GL_LINE_LOOP);
+            gl.glVertex3d(0, 0, z);
+            gl.glVertex3d(x, 0, z);
+            gl.glVertex3d(x, y, z);
+            gl.glVertex3d(0, y, z);
+        gl.glEnd();
+
+        // draw edges
+        gl.glBegin(GL.GL_LINES);
+            gl.glVertex3d(0, 0, 0);
+            gl.glVertex3d(0, 0, z);
+
+            gl.glVertex3d(x, 0, 0);
+            gl.glVertex3d(x, 0, z);
+
+            gl.glVertex3d(x, y, 0);
+            gl.glVertex3d(x, y, z);
+
+            gl.glVertex3d(0, y, 0);
+            gl.glVertex3d(0, y, z);
+        gl.glEnd();
     }
 
     private void zoom(double zoom, GL gl) {
@@ -278,11 +399,11 @@ public class DataVisualisation implements GLEventListener {
         }
 
         // drawing sphere
+        gl.glPushMatrix();
         moveTo(posArr, gl);
-        gl.glScaled(0.2, 0.2, 0.2);
+        gl.glScaled(tagSize, tagSize, tagSize);
         drawSphere(25, gl);
-        gl.glScaled(5, 5, 5);
-        moveBack(posArr, gl);
+        gl.glPopMatrix();
     }
 
     private void setDrawingColor(GL gl, Color color) {
@@ -405,7 +526,7 @@ public class DataVisualisation implements GLEventListener {
 
         @Override
         public void mouseDragged(MouseEvent e) {
-            absolutDirection = new Vector3d(0, 0, 1);
+            absoluteDirection = new Vector3d(0, 0, 1);
             old_rotx = view_rotx;
             old_roty = view_roty;
             old_rotz = view_rotz;
@@ -422,16 +543,18 @@ public class DataVisualisation implements GLEventListener {
             prevMouseX = x;
             prevMouseY = y;
 //            System.out.println(e.getModifiers());
-            // TODO replace number 18 by mask
-            if (e.getModifiers() == 18) {
-                view_rotz += thetaX;
-            } else {
+////             TODO replace number 18 by mask
+//            if (e.getModifiers() == 18) {
+//                view_rotz += thetaX;
+//            } else {
                 view_roty += thetaY;
                 view_rotx -= thetaX;
-            }
-            absolutDirection.rotate(-view_rotx, Vector3d.xAxis);
-            absolutDirection.rotate(-view_roty, Vector3d.yAxis);
-            absolutDirection.rotate(view_rotz, Vector3d.zAxis);
+//            }
+            absoluteDirection.rotate(-view_rotx, Vector3d.xAxis);
+            absoluteDirection.rotate(-view_roty, Vector3d.yAxis);
+//            absolutDirection.rotate(view_rotz, Vector3d.zAxis);
+
+            calcStrafeVectors();
         }
     };
 
@@ -443,57 +566,68 @@ public class DataVisualisation implements GLEventListener {
         }
     };
 
-    private double move_x = 0, move_y = 0, move_z = 0,
-                    old_x = 0, old_y = 0, old_z = 0;
+    private double moveStrafe = 0, move_y = 0, moveForward = 0,
+                    old_x = 0, old_y = 0, oldMoveForward = 0;
 
     private KeyListener kl = new KeyAdapter() {
 
         @Override
         public void keyPressed(KeyEvent e) {
-            move_z = 0;
+            moveForward = 0;
+            moveStrafe = 0;
             
             switch (e.getKeyCode())  {
                 case KeyEvent.VK_W:
                 case KeyEvent.VK_UP:
-                    if (e.getModifiers() == KeyEvent.CTRL_MASK) {
-                        move_y -= 0.1;
-                        break;
-                    }
-                    move_z += 0.1;
+                    moveForward += 0.1;
                     break;
                 case KeyEvent.VK_S:
                 case KeyEvent.VK_DOWN:
-                    if (e.getModifiers() == KeyEvent.CTRL_MASK) {
-                        System.out.println("ctrl");
-                        move_y += 0.1;
-                        break;
-                    }
-                    move_z -= 0.1;
+                    moveForward -= 0.1;
                     break;
                 case KeyEvent.VK_A:
                 case KeyEvent.VK_LEFT:
-                    move_x += 0.1;
+                    moveStrafe += 0.1;
                     break;
                 case KeyEvent.VK_D:
                 case KeyEvent.VK_RIGHT:
-                    move_x -= 0.1;
+                    moveStrafe -= 0.1;
+                    break;
+                case KeyEvent.VK_SPACE:
+                    move_y -= 0.1;
+                    break;
+                case KeyEvent.VK_C:
+                    move_y += 0.1;
                     break;
             }
             
 //            old_x += move_x;
 //            old_y += move_y;
-            old_z += move_z;
+            oldMoveForward += moveForward;
 
 //            Vector3d v = new Vector3d(0, 0, move_z);
 //            System.out.println(move_x+" "+move_y+" "+move_z);
-            Vector3d v = Vector3d.scalarTimesVector(move_z, absolutDirection);
-            absolutPosition.add(v);
+            Vector3d v = Vector3d.scalarTimesVector(moveForward, absoluteDirection);
+            absolutePosition.add(v);
+
+            absolutePosition.add(Vector3d.scalarTimesVector(moveStrafe, strafeCorr));
 
 //            moveView(move_x, move_y, move_z);
 //            moveView(old_x, old_y, old_z);
         }
 
     };
+
+    private void calcStrafeVectors() {
+//        System.out.println("absolute: "+absoluteDirection);
+         strafe = Vector3d.normalizeVector(Vector3d.projectToXZ(absoluteDirection));
+//         System.out.println("strafe: "+strafe);
+        // rotate counterclockwise
+        strafeCorr = new Vector3d(strafe.getZ(), 0, -strafe.getX());
+//        System.out.println("corr: "+strafeCorr);
+    }
+
+    private Vector3d strafe, strafeCorr;
 
     private double zoom = 1, rezoom = 1;
 
