@@ -141,6 +141,8 @@ public class MoteTrackApp extends JFrame {
         planeCheckBox = new JCheckBox();
         tagSizeSpinner = new JSpinner();
         tagSizeLabel = new JLabel();
+        drawAxesCheckBox = new JCheckBox();
+        detailedRoomPlanCheckBox = new JCheckBox();
         jMenuBar1 = new JMenuBar();
         fileMenu = new JMenu();
         startReplayServerItem = new JMenuItem();
@@ -194,6 +196,21 @@ public class MoteTrackApp extends JFrame {
 
         tagSizeLabel.setText("Tag drawing size (dm)");
 
+        drawAxesCheckBox.setText("draw Axes");
+        drawAxesCheckBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                drawAxesCheckBoxActionPerformed(evt);
+            }
+        });
+
+        detailedRoomPlanCheckBox.setSelected(true);
+        detailedRoomPlanCheckBox.setText("detailed room plan");
+        detailedRoomPlanCheckBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                detailedRoomPlanCheckBoxActionPerformed(evt);
+            }
+        });
+
         fileMenu.setText("File");
 
         startReplayServerItem.setText("Start Replay Server");
@@ -234,38 +251,47 @@ public class MoteTrackApp extends JFrame {
                     .addComponent(tagIdListLabel)
                     .addComponent(tagIdListScrollPane, GroupLayout.PREFERRED_SIZE, 146, GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(ComponentPlacement.RELATED)
+                .addComponent(canvas, GroupLayout.DEFAULT_SIZE, 559, Short.MAX_VALUE)
+                .addPreferredGap(ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(canvas, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 557, Short.MAX_VALUE)
+                    .addComponent(planeCheckBox)
+                    .addComponent(beacon2dCheckBox)
+                    .addComponent(historyCheckBox)
+                    .addComponent(resetButton)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(historyCheckBox)
-                        .addPreferredGap(ComponentPlacement.UNRELATED)
-                        .addComponent(beacon2dCheckBox)
-                        .addPreferredGap(ComponentPlacement.RELATED)
-                        .addComponent(planeCheckBox)
-                        .addPreferredGap(ComponentPlacement.UNRELATED)
                         .addComponent(tagSizeSpinner, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(ComponentPlacement.RELATED)
-                        .addComponent(tagSizeLabel)
-                        .addPreferredGap(ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
-                        .addComponent(resetButton)))
+                        .addComponent(tagSizeLabel))
+                    .addComponent(drawAxesCheckBox)
+                    .addComponent(detailedRoomPlanCheckBox))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                    .addComponent(tagIdListLabel)
-                    .addComponent(historyCheckBox)
-                    .addComponent(beacon2dCheckBox)
-                    .addComponent(resetButton)
-                    .addComponent(planeCheckBox)
-                    .addComponent(tagSizeSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(tagSizeLabel))
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(tagIdListScrollPane, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE)
-                    .addComponent(canvas, GroupLayout.DEFAULT_SIZE, 432, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(Alignment.TRAILING)
+                    .addComponent(canvas, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 446, Short.MAX_VALUE)
+                    .addGroup(Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(tagIdListLabel)
+                        .addPreferredGap(ComponentPlacement.RELATED)
+                        .addComponent(tagIdListScrollPane, GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE))
+                    .addGroup(Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(resetButton)
+                        .addGap(11, 11, 11)
+                        .addComponent(historyCheckBox)
+                        .addPreferredGap(ComponentPlacement.RELATED)
+                        .addComponent(beacon2dCheckBox)
+                        .addPreferredGap(ComponentPlacement.RELATED)
+                        .addComponent(planeCheckBox)
+                        .addPreferredGap(ComponentPlacement.RELATED)
+                        .addComponent(drawAxesCheckBox)
+                        .addPreferredGap(ComponentPlacement.RELATED)
+                        .addComponent(detailedRoomPlanCheckBox)
+                        .addPreferredGap(ComponentPlacement.RELATED, 277, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                            .addComponent(tagSizeSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tagSizeLabel))))
                 .addContainerGap())
         );
 
@@ -301,6 +327,14 @@ public class MoteTrackApp extends JFrame {
     private void tagSizeSpinnerStateChanged(ChangeEvent evt) {//GEN-FIRST:event_tagSizeSpinnerStateChanged
         renderer.setTagSize(Double.parseDouble(tagSizeSpinner.getValue().toString())/10);
     }//GEN-LAST:event_tagSizeSpinnerStateChanged
+
+    private void drawAxesCheckBoxActionPerformed(ActionEvent evt) {//GEN-FIRST:event_drawAxesCheckBoxActionPerformed
+        renderer.setDrawAxes(drawAxesCheckBox.isSelected());
+    }//GEN-LAST:event_drawAxesCheckBoxActionPerformed
+
+    private void detailedRoomPlanCheckBoxActionPerformed(ActionEvent evt) {//GEN-FIRST:event_detailedRoomPlanCheckBoxActionPerformed
+        renderer.setDetailedRoomPlan(detailedRoomPlanCheckBox.isSelected());
+    }//GEN-LAST:event_detailedRoomPlanCheckBoxActionPerformed
 
     /**
      * Called from within initComponents().
@@ -381,6 +415,8 @@ public class MoteTrackApp extends JFrame {
     private GLCanvas canvas;
     private JMenuItem connectMenuItem;
     private JMenuItem connectTagsMenuItem;
+    private JCheckBox detailedRoomPlanCheckBox;
+    private JCheckBox drawAxesCheckBox;
     private JMenuItem exitMenuItem;
     private JMenu fileMenu;
     private JCheckBox historyCheckBox;

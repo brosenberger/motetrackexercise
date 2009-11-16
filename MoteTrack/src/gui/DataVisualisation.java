@@ -31,9 +31,21 @@ import javax.media.opengl.glu.GLU;
  */
 public class DataVisualisation implements GLEventListener {
 
-    private boolean drawHistory = true, draw2dBeacon = true, drawPlane = false;
+    private boolean drawHistory = true, 
+                    draw2dBeacon = true,
+                    drawPlane = false,
+                    drawAxes = false,
+                    detailedRoomPlan = true;
     private ArrayList<String> selectedTagIds;
     private double tagSize = 0.2;
+
+    public void setDetailedRoomPlan(boolean detailedRoomPlan) {
+        this.detailedRoomPlan = detailedRoomPlan;
+    }
+
+    public void setDrawAxes(boolean drawAxes) {
+        this.drawAxes = drawAxes;
+    }
 
     public void setTagSize(double size) {
         tagSize = size;
@@ -139,17 +151,12 @@ public class DataVisualisation implements GLEventListener {
         gl.glTranslated(old_rotx, old_roty, old_rotz);
         moveAbsolute(gl);
 
-//        gl.glRotated(20, 1, 0, 0);
-//        gl.glRotated(25, 0, 1,0);
         gl.glTranslated(0 , -1.8, -10);
         gl.glRotated(-90, 1, 0, 0);
         gl.glTranslated(-7, -3.5, 0);
 
         // END OF MOVING VIEWPOINT //
 
-
-
-        
 
         // DRAW THE SCENE
         
@@ -200,25 +207,21 @@ public class DataVisualisation implements GLEventListener {
 //            gl.glVertex3d(0.512, 3.306, 2.271);
 //        gl.glEnd();
 
-        // Draw Room 1
-        drawWireCube(new Position(7.06, 3.478, 3.5), Color.WHITE, gl);
-
-        // Draw Room 2
-        gl.glPushMatrix();
-        gl.glTranslated(7.56, 0, 0);
-        drawWireCube(new Position(7.308, 7.32, 3.5), Color.WHITE, gl);
-
-        gl.glPopMatrix();
+        if (detailedRoomPlan) {
+            drawRooms(gl);
+        } else {
+            drawSimpleRooms(gl);
+        }
 
         // Draw Coordinate Axes
-        drawCoordinateAxes(gl);
+        if (drawAxes) {
+            drawCoordinateAxes(gl);
+        }
 
 
         if (drawPlane) {
             drawWirePlane(50, 50, 0, 25, 25, Color.WHITE, gl);
         }
-        
-        zoom(zoom, gl);
 
         // Remember that every push needs a pop; this one is paired with
         // rotating the entire gear assembly
@@ -226,6 +229,274 @@ public class DataVisualisation implements GLEventListener {
 
         // Flush all drawing operations to the graphics card
         gl.glFlush();
+    }
+
+    private void drawSimpleRooms(GL gl) {
+        setDrawingColor(gl, Color.WHITE);
+
+        // Draw Simple Room 1
+        drawWireCube(new Position(7.06, 3.478, 3.5), Color.WHITE, gl);
+
+        // Draw Simple Room 2
+        gl.glPushMatrix();
+        gl.glTranslated(7.56, 0, 0);
+        drawWireCube(new Position(7.308, 7.32, 3.5), Color.WHITE, gl);
+        gl.glPopMatrix();
+    }
+
+    private double depthDoor1 = 0.5, depthDoor2 = 0.1, depthDoor3 = 0.15, depthWallUp = 0.1;
+    private double door1up = 6.5, door1down = 5.6, door2left = 5.7, door2right = 6.6, door3up = door1up, door3down = door1down;
+    private void drawRooms(GL gl) {
+        double z = 0;
+        setDrawingColor(gl, Color.WHITE);
+  
+        drawFloor(gl);
+        drawDoorways(gl);
+        drawCeilings(gl);
+        drawEdges(gl);
+    }
+
+    private void drawFloor(GL gl) {
+        double z = 0;
+      // draw floor
+        gl.glBegin(GL.GL_LINE_LOOP);
+            gl.glVertex3d(0, 0, z);
+            gl.glVertex3d(7.06, 0, z);
+            gl.glVertex3d(7.06, 3.478, z);
+            // door 2 right
+            gl.glVertex3d(door2right, 3.478, z);
+            gl.glVertex3d(door2right, 3.478+depthDoor2, z);
+            // gangway lower right
+            gl.glVertex3d(7.06, 3.478+depthDoor2, z);
+            // door 1 down
+            gl.glVertex3d(7.06, door1down, z);
+            gl.glVertex3d(7.56, door1down, z);
+            gl.glVertex3d(7.56, 0, z);
+            gl.glVertex3d(7.56+7.308, 0, z);
+            gl.glVertex3d(7.56+7.308, 7.32, z);
+            gl.glVertex3d(7.56, 7.32, z);
+            // door 1 up
+            gl.glVertex3d(7.56, door1up, z);
+            gl.glVertex3d(7.06, door1up, z);
+            // gangway upper right
+            gl.glVertex3d(7.06, 7.32+depthWallUp, z);
+            // outer upper right
+            gl.glVertex3d(7.56+7.308+0.5, 7.32+depthWallUp, z);
+
+            gl.glVertex3d(7.56+7.308+0.5, -0.5, z);
+            gl.glVertex3d(-0.5, -0.5, z);
+            gl.glVertex3d(-0.5, 3.478+depthDoor2+3.9+depthWallUp, z);
+            // gangway upper left
+            gl.glVertex3d(5.25+depthDoor3, 3.478+depthDoor2+3.9+depthWallUp, z);
+            // door 3 up
+            gl.glVertex3d(5.25+depthDoor3, door3up, z);
+            gl.glVertex3d(5.25, door3up, z);
+            gl.glVertex3d(5.25, 3.478+depthDoor2+3.9, z);
+            gl.glVertex3d(0, 3.478+depthDoor2+3.9, z);
+            gl.glVertex3d(0, 3.478+depthDoor2, z);
+            gl.glVertex3d(5.25, 3.478+depthDoor2, z);
+            // door 3 down
+            gl.glVertex3d(5.25, door3down, z);
+            gl.glVertex3d(5.25+depthDoor3, door3down, z);
+            // gangway lower left
+            gl.glVertex3d(5.25+depthDoor3, 3.478+depthDoor2, z);
+            // door 2 left
+            gl.glVertex3d(door2left, 3.478+depthDoor2, z);
+            gl.glVertex3d(door2left, 3.478, z);
+
+            gl.glVertex3d(0, 3.478, z);
+        gl.glEnd();
+    }
+
+    private void drawDoorways(GL gl) {
+        double z = 2.5;
+        // draw doorway ceilings
+        // door 1
+        gl.glBegin(GL.GL_LINE_LOOP);
+            gl.glVertex3d(7.06, door1down, z);
+            gl.glVertex3d(7.56, door1down, z);
+            gl.glVertex3d(7.56, door1up, z);
+            gl.glVertex3d(7.06, door1up, z);
+        gl.glEnd();
+
+        // door2
+        gl.glBegin(GL.GL_LINE_LOOP);
+            gl.glVertex3d(door2right, 3.478, z);
+            gl.glVertex3d(door2right, 3.478+depthDoor2, z);
+            gl.glVertex3d(door2left, 3.478+depthDoor2, z);
+            gl.glVertex3d(door2left, 3.478, z);
+        gl.glEnd();
+
+        // door 3
+        gl.glBegin(GL.GL_LINE_LOOP);
+            gl.glVertex3d(5.25+depthDoor3, door3up, z);
+            gl.glVertex3d(5.25, door3up, z);
+            gl.glVertex3d(5.25, door3down, z);
+            gl.glVertex3d(5.25+depthDoor3, door3down, z);
+        gl.glEnd();
+
+        // draw doorway edges
+        gl.glBegin(GL.GL_LINES);
+            // door 1
+            gl.glVertex3d(7.06, door1down, 0);
+            gl.glVertex3d(7.06, door1down, z);
+
+            gl.glVertex3d(7.56, door1down, 0);
+            gl.glVertex3d(7.56, door1down, z);
+
+            gl.glVertex3d(7.56, door1up, 0);
+            gl.glVertex3d(7.56, door1up, z);
+
+            gl.glVertex3d(7.06, door1up, 0);
+            gl.glVertex3d(7.06, door1up, z);
+
+            // door2
+            gl.glVertex3d(door2right, 3.478, 0);
+            gl.glVertex3d(door2right, 3.478, z);
+
+            gl.glVertex3d(door2right, 3.478+depthDoor2, 0);
+            gl.glVertex3d(door2right, 3.478+depthDoor2, z);
+
+            gl.glVertex3d(door2left, 3.478+depthDoor2, 0);
+            gl.glVertex3d(door2left, 3.478+depthDoor2, z);
+
+            gl.glVertex3d(door2left, 3.478, 0);
+            gl.glVertex3d(door2left, 3.478, z);
+
+            // door 3
+            gl.glVertex3d(5.25+depthDoor3, door3up, 0);
+            gl.glVertex3d(5.25+depthDoor3, door3up, z);
+
+            gl.glVertex3d(5.25, door3up, 0);
+            gl.glVertex3d(5.25, door3up, z);
+
+            gl.glVertex3d(5.25, door3down, 0);
+            gl.glVertex3d(5.25, door3down, z);
+
+            gl.glVertex3d(5.25+depthDoor3, door3down, 0);
+            gl.glVertex3d(5.25+depthDoor3, door3down, z);
+        gl.glEnd();
+    }
+
+    private void drawCeilings(GL gl) {
+        // draw generall ceiling
+        double z = 4;
+        gl.glBegin(GL.GL_LINE_LOOP);
+            gl.glVertex3d(-0.5, -0.5, z);
+            gl.glVertex3d(7.56+7.308+0.5, -0.5, z);
+            gl.glVertex3d(7.56+7.308+0.5, 7.32+depthWallUp, z);
+            gl.glVertex3d(5.25+depthDoor3, 3.478+depthDoor2+3.9+depthWallUp, z);
+            gl.glVertex3d(-0.5, 3.478+depthDoor2+3.9+depthWallUp, z);
+        gl.glEnd();
+
+        z = 3.5;
+        // draw ceiling room 1
+        gl.glBegin(GL.GL_LINE_LOOP);
+            gl.glVertex3d(7.56, 0, z);
+            gl.glVertex3d(7.06+0.5+7.308, 0, z);
+            gl.glVertex3d(7.06+0.5+7.308, 7.32, z);
+            gl.glVertex3d(7.56, 7.32, z);
+        gl.glEnd();
+
+        // draw ceiling room 2
+        gl.glBegin(GL.GL_LINE_LOOP);
+            gl.glVertex3d(0, 0, z);
+            gl.glVertex3d(7.06, 0, z);
+            gl.glVertex3d(7.06, 3.478, z);
+            gl.glVertex3d(0, 3.478, z);
+        gl.glEnd();
+
+        // draw ceiling room 3
+        gl.glBegin(GL.GL_LINE_LOOP);
+            gl.glVertex3d(0, 3.478+depthDoor2, z);
+            gl.glVertex3d(5.25, 3.478+depthDoor2, z);
+            gl.glVertex3d(5.25, 3.478+depthDoor2+3.9, z);
+            gl.glVertex3d(0, 3.478+depthDoor2+3.9, z);
+        gl.glEnd();
+
+        // draw ceiling gangway
+        gl.glBegin(GL.GL_LINE_LOOP);
+            gl.glVertex3d(5.25+depthDoor3, 3.478+depthDoor2, z);
+            gl.glVertex3d(7.06, 3.478+depthDoor2, z);
+            gl.glVertex3d(7.06, 7.32+depthWallUp, z);
+            gl.glVertex3d(5.25+depthDoor3, 3.478+depthDoor2+3.9+depthWallUp, z);
+        gl.glEnd();
+    }
+
+    private void drawEdges(GL gl) {
+        double z = 3.5;
+        // draw edges
+        gl.glBegin(GL.GL_LINES);
+            // building
+            gl.glVertex3d(-0.5, -0.5, 0);
+            gl.glVertex3d(-0.5, -0.5, 4);
+
+            gl.glVertex3d(7.56+7.308+0.5, -0.5, 0);
+            gl.glVertex3d(7.56+7.308+0.5, -0.5, 4);
+
+            gl.glVertex3d(7.56+7.308+0.5, 7.32+depthWallUp, 0);
+            gl.glVertex3d(7.56+7.308+0.5, 7.32+depthWallUp, 4);
+
+//            gl.glVertex3d(5.25+depthDoor3, 3.478+depthDoor2+3.9+depthWallUp, 0);
+//            gl.glVertex3d(5.25+depthDoor3, 3.478+depthDoor2+3.9+depthWallUp, 4);
+
+            gl.glVertex3d(-0.5, 3.478+depthDoor2+3.9+depthWallUp, 0);
+            gl.glVertex3d(-0.5, 3.478+depthDoor2+3.9+depthWallUp, 4);
+
+            // rooms
+            // room 1
+            gl.glVertex3d(7.56, 0, 0);
+            gl.glVertex3d(7.56, 0, z);
+
+            gl.glVertex3d(7.06+0.5+7.308, 0, 0);
+            gl.glVertex3d(7.06+0.5+7.308, 0, z);
+
+            gl.glVertex3d(7.06+0.5+7.308, 7.32, 0);
+            gl.glVertex3d(7.06+0.5+7.308, 7.32, z);
+
+            gl.glVertex3d(7.56, 7.32, 0);
+            gl.glVertex3d(7.56, 7.32, z);
+
+            // room 2
+            gl.glVertex3d(0, 0, 0);
+            gl.glVertex3d(0, 0, 3.5);
+
+            gl.glVertex3d(7.06, 0, 0);
+            gl.glVertex3d(7.06, 0, z);
+
+            gl.glVertex3d(7.06, 3.478, 0);
+            gl.glVertex3d(7.06, 3.478, z);
+
+            gl.glVertex3d(0, 3.478, 0);
+            gl.glVertex3d(0, 3.478, z);
+
+            // room 3
+            gl.glVertex3d(0, 3.478+depthDoor2, 0);
+            gl.glVertex3d(0, 3.478+depthDoor2, z);
+
+            gl.glVertex3d(5.25, 3.478+depthDoor2, 0);
+            gl.glVertex3d(5.25, 3.478+depthDoor2, z);
+
+            gl.glVertex3d(5.25, 3.478+depthDoor2+3.9, 0);
+            gl.glVertex3d(5.25, 3.478+depthDoor2+3.9, z);
+
+            gl.glVertex3d(0, 3.478+depthDoor2+3.9, 0);
+            gl.glVertex3d(0, 3.478+depthDoor2+3.9, z);
+
+            // gangway
+            gl.glVertex3d(5.25+depthDoor3, 3.478+depthDoor2, 0);
+            gl.glVertex3d(5.25+depthDoor3, 3.478+depthDoor2, z);
+
+            gl.glVertex3d(7.06, 3.478+depthDoor2, 0);
+            gl.glVertex3d(7.06, 3.478+depthDoor2, z);
+
+            gl.glVertex3d(7.06, 7.32+depthWallUp, 0);
+            gl.glVertex3d(7.06, 7.32+depthWallUp, z);
+
+            gl.glVertex3d(5.25+depthDoor3, 3.478+depthDoor2+3.9+depthWallUp, 0);
+            gl.glVertex3d(5.25+depthDoor3, 3.478+depthDoor2+3.9+depthWallUp, z);
+
+        gl.glEnd();
     }
 
     private void drawStrafingInfo(GL gl) {
