@@ -38,6 +38,14 @@ public class SensorData {
             if (history == null) return null;
             return new ArrayList<SensorData>(history);
         }
+        public Position getLastPosition() throws NoPrevDataException {
+        	if (!prevData.containsKey(id)) {
+                throw new NoPrevDataException();
+            }
+        	SensorData data = prevData.get(id);
+        	if (data==null) return null;
+        	return data.getPos();
+        }
 
         @Override
 	public String toString() {
@@ -86,6 +94,7 @@ public class SensorData {
         if (!prevData.containsKey(id)) {
             throw new NoPrevDataException();
         }
+        if (prevData.get(id)==null) throw new NoPrevDataException();
 
         long deltaT = (timestamp - prevData.get(id).timestamp); // milliseconds
         double dist = getDirection().getLength();   // meter
