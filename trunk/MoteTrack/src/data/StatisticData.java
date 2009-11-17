@@ -43,9 +43,9 @@ public class StatisticData {
                 Iterator<Position> it = positions.iterator();
                 while (it.hasNext()) {
                         t = it.next();
-                        stddev.setX(Math.pow(t.getX()-means.getX(),2));
-                        stddev.setY(Math.pow(t.getY()-means.getY(),2));
-                        stddev.setZ(Math.pow(t.getZ()-means.getZ(),2));
+                        stddev.setX(stddev.getX()+Math.pow(t.getX()-means.getX(),2));
+                        stddev.setY(stddev.getY()+Math.pow(t.getY()-means.getY(),2));
+                        stddev.setZ(stddev.getZ()+Math.pow(t.getZ()-means.getZ(),2));
                 }
                 stddev.setX(Math.sqrt(stddev.getX()/(positions.size()-1)));
                 stddev.setY(Math.sqrt(stddev.getY()/(positions.size()-1)));
