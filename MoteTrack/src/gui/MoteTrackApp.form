@@ -46,6 +46,23 @@
             </MenuItem>
           </SubComponents>
         </Menu>
+        <Menu class="javax.swing.JMenu" name="optionsMenu">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Options"/>
+          </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem2">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Save configuration"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem1">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Load configuration"/>
+              </Properties>
+            </MenuItem>
+          </SubComponents>
+        </Menu>
       </SubComponents>
     </Menu>
   </NonVisualComponents>
@@ -85,13 +102,19 @@
                   <Component id="beacon2dCheckBox" min="-2" max="-2" attributes="0"/>
                   <Component id="historyCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="resetButton" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Group type="102" attributes="0">
-                      <Component id="tagSizeSpinner" min="-2" pref="40" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="tagSizeLabel" min="-2" max="-2" attributes="0"/>
-                  </Group>
                   <Component id="drawAxesCheckBox" min="-2" max="-2" attributes="0"/>
                   <Component id="detailedRoomPlanCheckBox" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                          <Component id="maxVelocitySpinner" alignment="0" max="32767" attributes="1"/>
+                          <Component id="tagSizeSpinner" alignment="0" pref="40" max="32767" attributes="1"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="maxVelocityLabel" min="-2" max="-2" attributes="0"/>
+                          <Component id="tagSizeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -120,7 +143,12 @@
                       <Component id="drawAxesCheckBox" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="detailedRoomPlanCheckBox" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="277" max="32767" attributes="0"/>
+                      <EmptySpace pref="251" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="maxVelocitySpinner" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="maxVelocityLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="tagSizeSpinner" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="tagSizeLabel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -228,6 +256,17 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="detailedRoomPlanCheckBoxActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JSpinner" name="maxVelocitySpinner">
+      <Properties>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="maxVelocityLabel">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="max velocity im m/s /100"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>
