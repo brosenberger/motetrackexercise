@@ -79,6 +79,14 @@ public class TagIdListModel implements ListModel {
         return tagIds.get(index);
     }
 
+    public ArrayList<String> getElementsAt(int[] indices) {
+        ArrayList<String> elements = new ArrayList<String>();
+        for (int i : indices) {
+            elements.add(getElementAt(i));
+        }
+        return elements;
+    }
+
     public void addListDataListener(ListDataListener l) {
         listeners.add(l);
     }

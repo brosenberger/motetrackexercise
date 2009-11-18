@@ -39,6 +39,8 @@ public class DataVisualisation implements GLEventListener {
                     drawAxes = false,
                     detailedRoomPlan = true;
     private ArrayList<String> selectedTagIds;
+    private ArrayList<String> selectedTag1Ids;
+    private ArrayList<String> selectedTag2Ids;
     private double tagSize = 0.2;
     private HashMap<String, SensorData> actualSensorDatas;
 
@@ -58,6 +60,14 @@ public class DataVisualisation implements GLEventListener {
         selectedTagIds = list;
     }
 
+    public void setSelectedTag1Ids(ArrayList<String> list) {
+        selectedTag1Ids = list;
+    }
+
+    public void setSelectedTag2Ids(ArrayList<String> list) {
+        selectedTag2Ids = list;
+    }
+
     public void setDrawPlane(boolean drawPlane) {
         this.drawPlane = drawPlane;
     }
@@ -68,6 +78,8 @@ public class DataVisualisation implements GLEventListener {
         absolutePosition = new Vector3d(0, 0, 0);
         absoluteDirection = new Vector3d(0, 0, 1);
         selectedTagIds = new ArrayList<String>();
+        selectedTag1Ids = new ArrayList<String>();
+        selectedTag2Ids = new ArrayList<String>();
         actualSensorDatas = SensorData.getData();
         // Use debug pipeline
         // drawable.setGL(new DebugGL(drawable.getGL()));
@@ -662,7 +674,12 @@ public class DataVisualisation implements GLEventListener {
             drawTagHistory(data, gl);
         }
 
-        if (selectedTagIds.contains(data.getId())) {
+        String id = data.getId();
+        if (selectedTag1Ids.contains(id)) {
+            setDrawingColor(gl, Color.BLUE);
+        } else if (selectedTag2Ids.contains(id)) {
+            setDrawingColor(gl, Color.YELLOW);
+        } else if (selectedTagIds.contains(id)) {
             setDrawingColor(gl, Color.RED);
         } else {
             setDrawingColor(gl, Color.WHITE);

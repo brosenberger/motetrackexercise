@@ -18,21 +18,19 @@ import exceptions.ClientAlreadyExistsException;
 import exceptions.IllegalTagIdFormatException;
 import java.awt.Component;
 import java.io.File;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.ListModel;
-import javax.swing.event.ListDataListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import listener.ConnectionListener;
 import misc.ServerLogger;
 import misc.SimpleListModel;
 import network.NormalizedServerDataReader;
 import network.ServerDataReader;
 import network.ServerReader;
+import network.VelocityNormalizerDataReader;
 
 /**
  *
@@ -45,6 +43,7 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
     private boolean connectionEstablished;
     private ServerDataReader client;
     private ConnectToServerDialog ctsd;
+    private VelocityNormalizerDataReader obs;
 
     /** Creates new form ConnectToServerDialog */
     public ConnectToServerDialog(MoteTrackApp parent, boolean modal) {
@@ -52,9 +51,23 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         simpleListModel = new SimpleListModel();
         this.parent = parent;
         initComponents();
+
+        maxVelocitySpinner.addChangeListener(maxValueSpinnerChangelistener);
+
         connectionEstablished = false;
         ctsd = this;
     }
+
+    private ChangeListener maxValueSpinnerChangelistener = new ChangeListener() {
+
+            public void stateChanged(ChangeEvent e) {
+                parent.setMaxVelocitySpinnerValue(getMaxVelocity());
+            }
+     };
+
+     public int getMaxVelocity() {
+         return Integer.parseInt(maxVelocitySpinner.getValue().toString());
+     }
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -82,6 +95,9 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         filenameLabel = new javax.swing.JLabel();
         filenameTextField = new javax.swing.JTextField();
         browseButton = new javax.swing.JButton();
+        maxVelocityCheckBox = new javax.swing.JCheckBox();
+        maxVelocitySpinner = new javax.swing.JSpinner();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Start Server");
@@ -105,11 +121,6 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         });
 
         serverAddressTextField.setText("localhost:5000");
-        serverAddressTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                serverAddressTextFieldActionPerformed(evt);
-            }
-        });
 
         replayLogLabel.setText("IP Address");
 
@@ -133,11 +144,6 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         });
 
         normalizeCheckBox.setText("normalize data");
-        normalizeCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                normalizeCheckBoxActionPerformed(evt);
-            }
-        });
 
         logCheckBox.setText("log data");
         logCheckBox.addActionListener(new java.awt.event.ActionListener() {
@@ -166,46 +172,62 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
             }
         });
 
+        maxVelocityCheckBox.setText("velocity observer");
+        maxVelocityCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                maxVelocityCheckBoxActionPerformed(evt);
+            }
+        });
+
+        maxVelocitySpinner.setEnabled(false);
+        maxVelocitySpinner.setValue(100);
+
+        jLabel1.setText("m/s / 100");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(19, 19, 19)
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(replayLogLabel, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(tagIdTextField)
+                        .addComponent(tagIdListScrollPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(addButton)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(removeButton))
+                        .addComponent(serverAddressTextField, javax.swing.GroupLayout.Alignment.LEADING))
+                    .addComponent(idLabel))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(replayLogLabel, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(tagIdTextField)
-                            .addComponent(tagIdListScrollPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 107, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(addButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(removeButton))
-                            .addComponent(serverAddressTextField, javax.swing.GroupLayout.Alignment.LEADING))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(37, 37, 37)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(53, 53, 53)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(logCheckBox)
-                                    .addComponent(pathLabel)
-                                    .addComponent(normalizeCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(52, 52, 52)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(filenameLabel)
-                                    .addComponent(browseButton)
-                                    .addComponent(filenameTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
-                                    .addComponent(pathTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(connectButton)
-                                .addGap(18, 18, 18)
-                                .addComponent(abortButton)
-                                .addGap(41, 41, 41))))
-                    .addComponent(idLabel))
-                .addContainerGap())
+                                .addComponent(maxVelocityCheckBox)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(maxVelocitySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel1)
+                                .addGap(14, 14, 14))
+                            .addComponent(normalizeCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
+                            .addComponent(logCheckBox)
+                            .addComponent(pathLabel)
+                            .addComponent(filenameLabel)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(filenameTextField, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                    .addComponent(pathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(browseButton)))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(connectButton)
+                        .addGap(18, 18, 18)
+                        .addComponent(abortButton)
+                        .addGap(33, 33, 33))))
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {abortButton, connectButton});
@@ -213,26 +235,30 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(replayLogLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(27, 27, 27)
                         .addComponent(normalizeCheckBox)
-                        .addGap(23, 23, 23)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(maxVelocityCheckBox)
+                            .addComponent(maxVelocitySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(logCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(pathLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(pathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(browseButton)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(pathTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(browseButton))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(filenameLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(filenameTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(replayLogLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(serverAddressTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(idLabel)
@@ -275,6 +301,11 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
             if (normalizeCheckBox.isSelected()) {
                 Position pos = new Position(0.15, 0.15, 0.15);
                 NormalizedServerDataReader obs = new NormalizedServerDataReader(pos, 1);
+                newClient.addObserver(obs);
+            }
+
+            if (maxVelocityCheckBox.isSelected()) {
+                obs = new VelocityNormalizerDataReader(Integer.valueOf(maxVelocitySpinner.getValue().toString()));
                 newClient.addObserver(obs);
             }
 
@@ -343,14 +374,6 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_abortButtonActionPerformed
 
-    private void serverAddressTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_serverAddressTextFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_serverAddressTextFieldActionPerformed
-
-    private void normalizeCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_normalizeCheckBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_normalizeCheckBoxActionPerformed
-
     private void logCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logCheckBoxActionPerformed
         boolean on = logCheckBox.isSelected();
         browseButton.setEnabled(on);
@@ -371,6 +394,12 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
             pathTextField.setText(dir.getPath());
         }
     }//GEN-LAST:event_browseButtonActionPerformed
+
+    private void maxVelocityCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maxVelocityCheckBoxActionPerformed
+        boolean selected = maxVelocityCheckBox.isSelected();
+        maxVelocitySpinner.setEnabled(selected);
+        parent.setMaxVelocitySpinnerEnabled(selected);
+    }//GEN-LAST:event_maxVelocityCheckBoxActionPerformed
 
     private SimpleDateFormat dateFormat;
 
@@ -416,23 +445,6 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         return JOptionPane.showConfirmDialog(this, msg, title, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
     }
 
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                ConnectToServerDialog dialog = new ConnectToServerDialog(new MoteTrackApp(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton abortButton;
@@ -442,7 +454,10 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
     private javax.swing.JLabel filenameLabel;
     private javax.swing.JTextField filenameTextField;
     private javax.swing.JLabel idLabel;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JCheckBox logCheckBox;
+    private javax.swing.JCheckBox maxVelocityCheckBox;
+    private javax.swing.JSpinner maxVelocitySpinner;
     private javax.swing.JCheckBox normalizeCheckBox;
     private javax.swing.JLabel pathLabel;
     private javax.swing.JTextField pathTextField;
@@ -468,7 +483,7 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
             
             if (connected) {
                 showInformationDialog("Connection to server established", "Connection Established");
-                parent.connectToServer(client, new HistoryCollector(client));
+                parent.connectToServer(client, new HistoryCollector(client), obs);
                 ctsd.dispose();
             } else {
                 showInformationDialog("Disconnected from server", "Server Disconnected");

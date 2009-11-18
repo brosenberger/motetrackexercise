@@ -43,13 +43,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.ListModel;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionListener;
 import misc.TagIdListModel;
 import network.ServerDataReader;
-import network.client.ReplayServerClient;
+import network.VelocityNormalizerDataReader;
 
 /**
  *
@@ -72,28 +71,34 @@ public class MoteTrackApp extends JFrame {
     private ConnectToServerDialog connectToServerDialog;
     private ConnectTagDialog connectTagDialog;
     private TagIdListModel tagIdListModel;
+    private VelocityNormalizerDataReader velocityNormalizerDataReader;
 
     private void autoStartReplayServer() {
         startServerDialog.startServer();
     }
 
+    public void setVelocityNormalizerDataReader(VelocityNormalizerDataReader observer) {
+        this.velocityNormalizerDataReader = observer;
+    }
+
     /** Creates new form MainFrame */
     public MoteTrackApp() {
-
-
         tagIdListModel = new TagIdListModel();
-
-        // for debugging only
-       // autoStartReplayServer();
 
         initComponents();
 
         startServerDialog = new StartReplayServerDialog(this, true);
         connectToServerDialog = new ConnectToServerDialog(this, true);
         connectTagDialog = new ConnectTagDialog(this, false);
+        maxVelocitySpinner.setValue(connectToServerDialog.getMaxVelocity());
 
+        // for debugging only
+//        autoStartReplayServer();
 
+        // LISTENER
         tagIdList.addListSelectionListener(listSelectionListener);
+        maxVelocitySpinner.addChangeListener(maxVelocitySpinnerChangeListener);
+
 
         setTitle("Motion Tracking Application");
 
@@ -151,12 +156,17 @@ public class MoteTrackApp extends JFrame {
         tagSizeLabel = new JLabel();
         drawAxesCheckBox = new JCheckBox();
         detailedRoomPlanCheckBox = new JCheckBox();
+        maxVelocitySpinner = new JSpinner();
+        maxVelocityLabel = new JLabel();
         jMenuBar1 = new JMenuBar();
         fileMenu = new JMenu();
         startReplayServerItem = new JMenuItem();
         connectMenuItem = new JMenuItem();
         connectTagsMenuItem = new JMenuItem();
         exitMenuItem = new JMenuItem();
+        optionsMenu = new JMenu();
+        jMenuItem2 = new JMenuItem();
+        jMenuItem1 = new JMenuItem();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -219,6 +229,11 @@ public class MoteTrackApp extends JFrame {
             }
         });
 
+        maxVelocitySpinner.setEnabled(false);
+
+        maxVelocityLabel.setText("max velocity im m/s /100");
+        maxVelocityLabel.setEnabled(false);
+
         fileMenu.setText("File");
 
         startReplayServerItem.setText("Start Replay Server");
@@ -252,6 +267,16 @@ public class MoteTrackApp extends JFrame {
 
         jMenuBar1.add(fileMenu);
 
+        optionsMenu.setText("Options");
+
+        jMenuItem2.setText("Save configuration");
+        optionsMenu.add(jMenuItem2);
+
+        jMenuItem1.setText("Load configuration");
+        optionsMenu.add(jMenuItem1);
+
+        jMenuBar1.add(optionsMenu);
+
         setJMenuBar(jMenuBar1);
 
         GroupLayout layout = new GroupLayout(getContentPane());
@@ -271,12 +296,16 @@ public class MoteTrackApp extends JFrame {
                     .addComponent(beacon2dCheckBox)
                     .addComponent(historyCheckBox)
                     .addComponent(resetButton)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(tagSizeSpinner, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(ComponentPlacement.RELATED)
-                        .addComponent(tagSizeLabel))
                     .addComponent(drawAxesCheckBox)
-                    .addComponent(detailedRoomPlanCheckBox))
+                    .addComponent(detailedRoomPlanCheckBox)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.TRAILING, false)
+                            .addComponent(maxVelocitySpinner, Alignment.LEADING)
+                            .addComponent(tagSizeSpinner, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE))
+                        .addPreferredGap(ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                            .addComponent(maxVelocityLabel)
+                            .addComponent(tagSizeLabel))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -301,7 +330,11 @@ public class MoteTrackApp extends JFrame {
                         .addComponent(drawAxesCheckBox)
                         .addPreferredGap(ComponentPlacement.RELATED)
                         .addComponent(detailedRoomPlanCheckBox)
-                        .addPreferredGap(ComponentPlacement.RELATED, 277, Short.MAX_VALUE)
+                        .addPreferredGap(ComponentPlacement.RELATED, 251, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                            .addComponent(maxVelocitySpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(maxVelocityLabel))
+                        .addPreferredGap(ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                             .addComponent(tagSizeSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(tagSizeLabel))))
@@ -430,7 +463,30 @@ public class MoteTrackApp extends JFrame {
         ((TagIdListModel) tagIdList.getModel()).setHistorycollector(historyCollector);
     }
 
-    
+    public void connectToServer(ServerDataReader client, HistoryCollector historyCollector, VelocityNormalizerDataReader observer) {
+        this.client = client;
+        this.historyCollector = historyCollector;
+        ((TagIdListModel) tagIdList.getModel()).setHistorycollector(historyCollector);
+        this.velocityNormalizerDataReader = observer;
+    }
+
+    public void setMaxVelocitySpinnerValue(int value) {
+        maxVelocitySpinner.setValue(value);
+    }
+
+    public void setMaxVelocitySpinnerEnabled(boolean enabled) {
+        maxVelocitySpinner.setEnabled(enabled);
+        maxVelocityLabel.setEnabled(enabled);
+    }
+
+    private ChangeListener maxVelocitySpinnerChangeListener = new ChangeListener() {
+
+        public void stateChanged(ChangeEvent e) {
+            if (velocityNormalizerDataReader != null) {
+                velocityNormalizerDataReader.setMaxSpeed(Double.parseDouble(maxVelocitySpinner.getValue().toString())/100);
+            }
+        }
+    };
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -444,6 +500,11 @@ public class MoteTrackApp extends JFrame {
     private JMenu fileMenu;
     private JCheckBox historyCheckBox;
     private JMenuBar jMenuBar1;
+    private JMenuItem jMenuItem1;
+    private JMenuItem jMenuItem2;
+    private JLabel maxVelocityLabel;
+    private JSpinner maxVelocitySpinner;
+    private JMenu optionsMenu;
     private JCheckBox planeCheckBox;
     private JButton resetButton;
     private JMenuItem startReplayServerItem;
@@ -452,5 +513,13 @@ public class MoteTrackApp extends JFrame {
     private JLabel tagSizeLabel;
     private JSpinner tagSizeSpinner;
     // End of variables declaration//GEN-END:variables
+
+    public void setSelectedTag1Ids(ArrayList<String> list) {
+        renderer.setSelectedTag1Ids(list);
+    }
+
+    public void setSelectedTag2Ids(ArrayList<String> list) {
+        renderer.setSelectedTag2Ids(list);
+    }
 
 }
