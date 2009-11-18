@@ -17,6 +17,8 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+
 import javax.media.opengl.GL;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
@@ -668,6 +670,9 @@ public class DataVisualisation implements GLEventListener {
         if (draw2dBeacon) {
             draw2dBeacon(pos, gl);
         }
+        
+        //draw Connections to other tags
+        drawConnections(data,gl);
 
         // drawing sphere
         gl.glPushMatrix();
@@ -675,6 +680,18 @@ public class DataVisualisation implements GLEventListener {
         gl.glScaled(tagSize, tagSize, tagSize);
         drawSphere(25, gl);
         gl.glPopMatrix();
+    }
+    
+    private void drawConnections(SensorData sd, GL gl) {
+    	Iterator<SensorData> it = sd.getConnectedTags().iterator();
+    	SensorData t;
+    	gl.glBegin(gl.GL_LINES);
+    	while (it.hasNext()) {
+    		t = it.next();
+    		gl.glVertex3d(sd.getPos().getX(),sd.getPos().getY(),sd.getPos().getZ());
+    		gl.glVertex3d(t.getPos().getX(),t.getPos().getY(),t.getPos().getZ());
+    	}
+    	gl.glEnd();
     }
 
     private void setDrawingColor(GL gl, Color color) {
