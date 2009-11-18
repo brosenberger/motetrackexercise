@@ -14,8 +14,10 @@ public class SensorData {
         private static HashMap<String, SensorData> actData = new HashMap<String, SensorData>(),
                                                     prevData = new HashMap<String, SensorData>();
 	private ArrayList<SensorData> history;
+        private ArrayList<SensorData> connectedTags;
         
 	public SensorData(String id, long timestamp, double x, double y, double z) {
+                connectedTags = new ArrayList<SensorData>();
 		this.id = id;
 		this.timestamp = timestamp;
 		pos = new Position(x, y, z);
@@ -23,6 +25,7 @@ public class SensorData {
 	}
 
         public SensorData(String sensorData) {
+            connectedTags = new ArrayList<SensorData>();
             String[] splitData = sensorData.split(" ");
             id = splitData[0];
             timestamp = Long.parseLong(splitData[1]);
@@ -146,6 +149,18 @@ public class SensorData {
 
 
         return sb.toString();
+    }
+
+    public boolean addConnectedTag(SensorData tag) {
+        return connectedTags.add(tag);
+    }
+
+    public boolean removeConnectedTag(SensorData tag) {
+        return connectedTags.remove(tag);
+    }
+
+    public ArrayList<SensorData> getConnectedTags() {
+        return new ArrayList<SensorData>(connectedTags);
     }
 
     public static boolean isValidTagId(String id) {
