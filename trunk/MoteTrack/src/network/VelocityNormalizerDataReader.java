@@ -9,9 +9,13 @@ import exceptions.NoPrevDataException;
 
 public class VelocityNormalizerDataReader extends Observable implements
 		Observer {
-	private double maxSpeed;
+	private volatile double maxSpeed;
 	
 	public VelocityNormalizerDataReader(double maxSpeed) {
+		this.maxSpeed = maxSpeed;
+	}
+	
+	public void setMaxSpeed(double maxSpeed) {
 		this.maxSpeed = maxSpeed;
 	}
 	
