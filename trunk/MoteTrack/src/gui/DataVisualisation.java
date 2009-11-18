@@ -40,6 +40,7 @@ public class DataVisualisation implements GLEventListener {
                     detailedRoomPlan = true;
     private ArrayList<String> selectedTagIds;
     private double tagSize = 0.2;
+    private HashMap<String, SensorData> actualSensorDatas;
 
     public void setDetailedRoomPlan(boolean detailedRoomPlan) {
         this.detailedRoomPlan = detailedRoomPlan;
@@ -67,6 +68,7 @@ public class DataVisualisation implements GLEventListener {
         absolutePosition = new Vector3d(0, 0, 0);
         absoluteDirection = new Vector3d(0, 0, 1);
         selectedTagIds = new ArrayList<String>();
+        actualSensorDatas = SensorData.getData();
         // Use debug pipeline
         // drawable.setGL(new DebugGL(drawable.getGL()));
 
@@ -163,9 +165,9 @@ public class DataVisualisation implements GLEventListener {
         // DRAW THE SCENE
         
         // Drawing tags
-        HashMap<String, SensorData> sd = SensorData.getData();
-        if (sd != null) {
-            for (SensorData data : SensorData.getData().values()) {
+        actualSensorDatas = SensorData.getData();
+        if (actualSensorDatas != null) {
+            for (SensorData data : actualSensorDatas.values()) {
                // gl.glPushMatrix();
                 gl.glColor3d(1, 1, 1);
                 if (data != null) {
@@ -683,13 +685,19 @@ public class DataVisualisation implements GLEventListener {
     }
     
     private void drawConnections(SensorData sd, GL gl) {
-    	Iterator<SensorData> it = sd.getConnectedTags().iterator();
+        if (!SensorData.getConnectedTags().containsKey(sd.getId())) {
+            return;
+        }
+
+    	Iterator<String> it = SensorData.getConnectedTags().get(sd.getId()).iterator();
     	SensorData t;
     	gl.glBegin(gl.GL_LINES);
     	while (it.hasNext()) {
-    		t = it.next();
-    		gl.glVertex3d(sd.getPos().getX(),sd.getPos().getY(),sd.getPos().getZ());
-    		gl.glVertex3d(t.getPos().getX(),t.getPos().getY(),t.getPos().getZ());
+    		t = actualSensorDatas.get(it.next());
+                if (t != null) {
+                    gl.glVertex3d(sd.getPos().getX(),sd.getPos().getY(),sd.getPos().getZ());
+                    gl.glVertex3d(t.getPos().getX(),t.getPos().getY(),t.getPos().getZ());
+                }
     	}
     	gl.glEnd();
     }

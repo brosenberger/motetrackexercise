@@ -43,6 +43,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.ListModel;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionListener;
@@ -69,6 +70,8 @@ public class MoteTrackApp extends JFrame {
     private HistoryCollector historyCollector;
     private StartReplayServerDialog startServerDialog;
     private ConnectToServerDialog connectToServerDialog;
+    private ConnectTagDialog connectTagDialog;
+    private TagIdListModel tagIdListModel;
 
     private void autoStartReplayServer() {
         startServerDialog.startServer();
@@ -77,13 +80,18 @@ public class MoteTrackApp extends JFrame {
     /** Creates new form MainFrame */
     public MoteTrackApp() {
 
-        startServerDialog = new StartReplayServerDialog(this, true);
-        connectToServerDialog = new ConnectToServerDialog(this, true);
+
+        tagIdListModel = new TagIdListModel();
 
         // for debugging only
        // autoStartReplayServer();
 
         initComponents();
+
+        startServerDialog = new StartReplayServerDialog(this, true);
+        connectToServerDialog = new ConnectToServerDialog(this, true);
+        connectTagDialog = new ConnectTagDialog(this, false);
+
 
         tagIdList.addListSelectionListener(listSelectionListener);
 
@@ -177,7 +185,7 @@ public class MoteTrackApp extends JFrame {
             }
         });
 
-        tagIdList.setModel(new TagIdListModel());
+        tagIdList.setModel(tagIdListModel);
         tagIdListScrollPane.setViewportView(tagIdList);
 
         planeCheckBox.setText("show Plane");
@@ -230,6 +238,11 @@ public class MoteTrackApp extends JFrame {
         fileMenu.add(connectMenuItem);
 
         connectTagsMenuItem.setText("Connect Tags");
+        connectTagsMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                connectTagsMenuItemActionPerformed(evt);
+            }
+        });
         fileMenu.add(connectTagsMenuItem);
 
         exitMenuItem.setAction(exitAction);
@@ -336,6 +349,10 @@ public class MoteTrackApp extends JFrame {
         renderer.setDetailedRoomPlan(detailedRoomPlanCheckBox.isSelected());
     }//GEN-LAST:event_detailedRoomPlanCheckBoxActionPerformed
 
+    private void connectTagsMenuItemActionPerformed(ActionEvent evt) {//GEN-FIRST:event_connectTagsMenuItemActionPerformed
+        connectTagDialog.setVisible(true);
+    }//GEN-LAST:event_connectTagsMenuItemActionPerformed
+
     /**
      * Called from within initComponents().
      * hint: to customize the generated code choose 'Customize Code' in the contextmenu
@@ -376,6 +393,10 @@ public class MoteTrackApp extends JFrame {
         });
     }
 
+    public TagIdListModel getTagIdListModel() {
+        return tagIdListModel;
+    }
+
     private Action exitAction = new AbstractAction("EXIT") {
 
         public void actionPerformed(ActionEvent e) {
@@ -408,6 +429,8 @@ public class MoteTrackApp extends JFrame {
         this.historyCollector = historyCollector;
         ((TagIdListModel) tagIdList.getModel()).setHistorycollector(historyCollector);
     }
+
+    
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
