@@ -14,10 +14,9 @@ public class SensorData {
         private static HashMap<String, SensorData> actData = new HashMap<String, SensorData>(),
                                                     prevData = new HashMap<String, SensorData>();
 	private ArrayList<SensorData> history;
-        private ArrayList<SensorData> connectedTags;
+        private static HashMap<String, ArrayList<String>> connectedTags = new HashMap<String, ArrayList<String>>();
         
 	public SensorData(String id, long timestamp, double x, double y, double z) {
-                connectedTags = new ArrayList<SensorData>();
 		this.id = id;
 		this.timestamp = timestamp;
 		pos = new Position(x, y, z);
@@ -25,7 +24,6 @@ public class SensorData {
 	}
 
         public SensorData(String sensorData) {
-            connectedTags = new ArrayList<SensorData>();
             String[] splitData = sensorData.split(" ");
             id = splitData[0];
             timestamp = Long.parseLong(splitData[1]);
@@ -151,16 +149,64 @@ public class SensorData {
         return sb.toString();
     }
 
-    public boolean addConnectedTag(SensorData tag) {
-        return connectedTags.add(tag);
+    public static boolean connectTags(String tagId1, String tagId2) {
+        try {
+            tagId1 = formatId(tagId1, true);
+            tagId2 = formatId(tagId2, true);
+        } catch (IllegalTagIdFormatException e) {
+            System.err.println("ILLEGAL TAG IDS");
+            return false;
+        }
+        
+        if (areConnected(tagId1, tagId2)) {
+            return false;
+        }
+
+        ArrayList<String> connected;
+        if (connectedTags.containsKey(tagId1)) {
+            connected = connectedTags.get(tagId1);
+        } else {
+            connected = new ArrayList<String>();
+            connectedTags.put(tagId1, connected);
+        }
+
+        return connected.add(tagId2);
     }
 
-    public boolean removeConnectedTag(SensorData tag) {
-        return connectedTags.remove(tag);
+    public static boolean disconnectTags(String tagId1, String tagId2) {
+        try {
+            tagId1 = formatId(tagId1, true);
+            tagId2 = formatId(tagId2, true);
+        } catch (IllegalTagIdFormatException e) {
+            System.err.println("ILLEGAL TAG IDS");
+            return false;
+        }
+        boolean removed = false;
+
+        if (areConnected(tagId1, tagId2)) {
+            if (connectedTags.containsKey(tagId1)) {
+                removed = connectedTags.get(tagId1).remove(tagId2);
+            } else {
+                removed = connectedTags.get(tagId2).remove(tagId1);
+            }
+        }
+
+        return removed;
     }
 
-    public ArrayList<SensorData> getConnectedTags() {
-        return new ArrayList<SensorData>(connectedTags);
+    private static boolean areConnected(String tagId1, String tagId2) {
+        boolean connected = false;
+        if (connectedTags.containsKey(tagId1)) {
+            connected = connectedTags.get(tagId1).contains(tagId2);
+        } else if (connectedTags.containsKey(tagId2)) {
+            connected = connectedTags.get(tagId2).contains(tagId1);
+        }
+
+        return connected;
+    }
+
+    public static HashMap<String, ArrayList<String>> getConnectedTags() {
+        return connectedTags;
     }
 
     public static boolean isValidTagId(String id) {

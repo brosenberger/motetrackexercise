@@ -75,7 +75,7 @@ public class TagIdListModel implements ListModel {
         return tagIds.size();
     }
 
-    public Object getElementAt(int index) {
+    public String getElementAt(int index) {
         return tagIds.get(index);
     }
 
