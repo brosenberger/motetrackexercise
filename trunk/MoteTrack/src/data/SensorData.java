@@ -15,7 +15,12 @@ public class SensorData {
                                                     prevData = new HashMap<String, SensorData>();
 	private ArrayList<SensorData> history;
         private static HashMap<String, ArrayList<String>> connectedTags = new HashMap<String, ArrayList<String>>();
-        
+
+
+        public static void setConnectedTags(HashMap<String, ArrayList<String>> connectedTags2) {
+            connectedTags = connectedTags2;
+        }
+
 	public SensorData(String id, long timestamp, double x, double y, double z) {
 		this.id = id;
 		this.timestamp = timestamp;

@@ -48,6 +48,7 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
     /** Creates new form ConnectToServerDialog */
     public ConnectToServerDialog(MoteTrackApp parent, boolean modal) {
         super(parent, modal);
+        normalizationPos = new Position(0, 0, 0);
         simpleListModel = new SimpleListModel();
         this.parent = parent;
         initComponents();
@@ -299,7 +300,7 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
             int port = Integer.parseInt(split[1]);
             ServerDataReader newClient = new ServerDataReader(address, port, ids);
             if (normalizeCheckBox.isSelected()) {
-                Position pos = new Position(0.15, 0.15, 0.15);
+                Position pos = normalizationPos;
                 NormalizedServerDataReader obs = new NormalizedServerDataReader(pos, 1);
                 newClient.addObserver(obs);
             }
@@ -319,19 +320,21 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
 
                 String filename = path + formatFilename(filenameTextField.getText());
                 File file = new File(filename);
-                ServerLogger logger = new ServerLogger(filename);
+                ServerLogger logger;
                 if (file.exists()) {
                     int answer = JOptionPane.showConfirmDialog(this, "File already exists - Override?", "File Already Exists", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                     if (answer == JOptionPane.YES_OPTION) {
+                        logger = new ServerLogger(filename);
                         newClient.addObserver(logger);
                     }
                 } else {
+                    logger = new ServerLogger(filename);
                     newClient.addObserver(logger);
                 }
             }
 
             if (client != null) {
-                int answer = showYesNoDialog("Already connect to a Server. Connection will be closed.\nProceed?", "Already Connected");
+                int answer = showYesNoDialog("Already connected to a Server. Connection will be closed.\nProceed?", "Already Connected");
                 if (answer == JOptionPane.NO_OPTION) {
                     return;
                 }
@@ -496,4 +499,16 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
             client = null;
         }
     };
+
+    public void setTagIdFilter(String[] ids) {
+        for (String s : ids) {
+            simpleListModel.addElement(s);
+        }
+    }
+
+    private Position normalizationPos;
+
+    public void setNormalizationPos(Position pos) {
+        normalizationPos = pos;
+    }
 }
