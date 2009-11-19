@@ -13,6 +13,7 @@ package gui;
 
 import java.io.File;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import network.ReplayServer;
 
 /**
@@ -160,18 +161,26 @@ public class StartReplayServerDialog extends javax.swing.JDialog {
     }//GEN-LAST:event_browseButtonActionPerformed
 
     private void startServerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startServerButtonActionPerformed
-        startServer();
-        dispose();
+        if(startServer()) {
+            dispose();
+        }
     }//GEN-LAST:event_startServerButtonActionPerformed
 
 
     // for autostart of server protected
-    protected void startServer() {
+    protected boolean startServer() {
         String filename = replayLogTextField.getText();
+        File file = new File(filename);
+        if (!file.exists()) {
+            JOptionPane.showMessageDialog(this, "Replay file doesn't exist - please check path", "File not found", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
         int rate = Integer.parseInt(rateTextField.getText());
         int port = Integer.parseInt(portTextField.getText());
 
         new ReplayServer(filename, rate, port);
+
+        return true;
     }
 
     /**
@@ -204,4 +213,16 @@ public class StartReplayServerDialog extends javax.swing.JDialog {
     private javax.swing.JButton startServerButton;
     // End of variables declaration//GEN-END:variables
 
+
+    public void setReplayFile(String file) {
+        replayLogTextField.setText(file);
+    }
+
+    public void setReplayRate(int rate) {
+        rateTextField.setText(String.valueOf(rate));
+    }
+
+    public void setReplayServerPort(int port) {
+        portTextField.setText(String.valueOf(port));
+    }
 }

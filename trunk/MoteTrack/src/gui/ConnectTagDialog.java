@@ -194,7 +194,7 @@ public class ConnectTagDialog extends javax.swing.JDialog {
 
             ArrayList<String> selectedIds = tagIdListModel.getElementsAt(indices);
             try {
-                parent.setSelectedTag1Ids(SensorData.format(selectedIds, true));
+                parent.setSelectedFromTagIds(SensorData.format(selectedIds, true));
             } catch (IllegalTagIdFormatException ex) {
                 System.err.println("ILLEGAL TAG ID FORMAT (list1SelectionListener - ConnectTagDialog)");
                 Logger.getLogger(ConnectTagDialog.class.getName()).log(Level.SEVERE, null, ex);
@@ -214,7 +214,7 @@ public class ConnectTagDialog extends javax.swing.JDialog {
 
             ArrayList<String> selectedIds = tagIdListModel.getElementsAt(indices);
             try {
-                parent.setSelectedTag2Ids(SensorData.format(selectedIds, true));
+                parent.setSelectedToTagIds(SensorData.format(selectedIds, true));
             } catch (IllegalTagIdFormatException ex) {
                 System.err.println("ILLEGAL TAG ID FORMAT (list2SelectionListener - ConnectTagDialog)");
                 Logger.getLogger(ConnectTagDialog.class.getName()).log(Level.SEVERE, null, ex);
