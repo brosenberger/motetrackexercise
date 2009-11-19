@@ -26,7 +26,7 @@ public class VelocityNormalizerDataReader extends Observable implements
 		try {
 			if (data.getVelocity()>this.maxSpeed) {
 				data.setPos(data.getLastPosition());
-			}
+			} else if (data.getVelocity()<Math.pow(10, -7));
 		} catch (NoPrevDataException e) {}
 		this.setChanged();
 		this.notifyObservers(data);

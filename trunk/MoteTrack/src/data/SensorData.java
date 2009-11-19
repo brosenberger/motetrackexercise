@@ -108,6 +108,11 @@ public class SensorData {
         }
         return new Vector3d(prevData.get(id).pos, pos);
     }
+    
+    public double getAngle(Position pos) {
+    	Vector3d vec = new Vector3d(this.pos,pos);
+    	return Vector3d.getAngleBetween(vec, Vector3d.projectToXY(vec));
+    }
 
     public void setHistory(ArrayList<SensorData> history) {
         this.history = history;
