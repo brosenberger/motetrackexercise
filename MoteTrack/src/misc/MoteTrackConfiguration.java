@@ -64,4 +64,10 @@ public class MoteTrackConfiguration {
 		}
 		return list;
 	}
+	public String getServer() {
+		return config.get("server").replace('@', ':');
+	}
+	public void setServer(String server) {
+		config.put("server", server.replace(':', '@'));
+	}
 }
