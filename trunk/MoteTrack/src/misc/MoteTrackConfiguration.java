@@ -80,4 +80,35 @@ public class MoteTrackConfiguration {
 		}
 		config.put("filter", whole.substring(1));
 	}
+	public String getReplayFile() {
+		return config.get("replayFile");
+	}
+	public void setReplayFile(String replayFile) {
+		config.put("replayFile", replayFile);
+	}
+	public int getReplayRate() {
+		return Integer.parseInt(config.get("replayRate"));
+	}
+	public void setReplayRate(int rate) {
+		config.put("replayRate", rate+"");
+	}
+	public int getReplayPort() {
+		return Integer.parseInt(config.get("replayPort"));
+	}
+	public void setReplayPort(int port) {
+		config.put("replayPort", port+"");
+	}
+	public boolean isNormalized() {
+		return config.get("normalized").compareTo("true")==0;
+	}
+	public void setNormalized(boolean b) {
+		if (b) config.put("normalized", "true");
+		else config.put("normalized", "false");
+	}
+	public void setHistoryReadings(int readings) {
+		config.put("history", readings+"");
+	}
+	public int getHistoryReadings() {
+		return Integer.parseInt(config.get("history"));
+	}
 }
