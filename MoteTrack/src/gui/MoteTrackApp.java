@@ -16,6 +16,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import com.sun.opengl.util.Animator;
 import data.HistoryCollector;
+import data.Position;
 import data.SensorData;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -24,6 +25,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.media.opengl.GLCanvas;
@@ -46,6 +48,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionListener;
+import misc.MoteTrackConfiguration;
 import misc.TagIdListModel;
 import network.ServerDataReader;
 import network.VelocityNormalizerDataReader;
@@ -98,6 +101,7 @@ public class MoteTrackApp extends JFrame {
         // LISTENER
         tagIdList.addListSelectionListener(listSelectionListener);
         maxVelocitySpinner.addChangeListener(maxVelocitySpinnerChangeListener);
+        maxHistoryReadingsSpinner.addChangeListener(maxHistoryReadingsSpinnerChangeListener);
 
 
         setTitle("Motion Tracking Application");
@@ -158,6 +162,8 @@ public class MoteTrackApp extends JFrame {
         detailedRoomPlanCheckBox = new JCheckBox();
         maxVelocitySpinner = new JSpinner();
         maxVelocityLabel = new JLabel();
+        jLabel1 = new JLabel();
+        maxHistoryReadingsSpinner = new JSpinner();
         jMenuBar1 = new JMenuBar();
         fileMenu = new JMenu();
         startReplayServerItem = new JMenuItem();
@@ -234,6 +240,10 @@ public class MoteTrackApp extends JFrame {
         maxVelocityLabel.setText("max velocity im m/s /100");
         maxVelocityLabel.setEnabled(false);
 
+        jLabel1.setText("draw history for last n readings");
+
+        maxHistoryReadingsSpinner.setValue(20);
+
         fileMenu.setText("File");
 
         startReplayServerItem.setText("Start Replay Server");
@@ -273,6 +283,11 @@ public class MoteTrackApp extends JFrame {
         optionsMenu.add(jMenuItem2);
 
         jMenuItem1.setText("Load configuration");
+        jMenuItem1.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
         optionsMenu.add(jMenuItem1);
 
         jMenuBar1.add(optionsMenu);
@@ -298,8 +313,10 @@ public class MoteTrackApp extends JFrame {
                     .addComponent(resetButton)
                     .addComponent(drawAxesCheckBox)
                     .addComponent(detailedRoomPlanCheckBox)
+                    .addComponent(jLabel1)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.TRAILING, false)
+                            .addComponent(maxHistoryReadingsSpinner, Alignment.LEADING)
                             .addComponent(maxVelocitySpinner, Alignment.LEADING)
                             .addComponent(tagSizeSpinner, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE))
                         .addPreferredGap(ComponentPlacement.RELATED)
@@ -330,7 +347,11 @@ public class MoteTrackApp extends JFrame {
                         .addComponent(drawAxesCheckBox)
                         .addPreferredGap(ComponentPlacement.RELATED)
                         .addComponent(detailedRoomPlanCheckBox)
-                        .addPreferredGap(ComponentPlacement.RELATED, 251, Short.MAX_VALUE)
+                        .addGap(80, 80, 80)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(ComponentPlacement.RELATED)
+                        .addComponent(maxHistoryReadingsSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(ComponentPlacement.RELATED, 131, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                             .addComponent(maxVelocitySpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(maxVelocityLabel))
@@ -385,6 +406,18 @@ public class MoteTrackApp extends JFrame {
     private void connectTagsMenuItemActionPerformed(ActionEvent evt) {//GEN-FIRST:event_connectTagsMenuItemActionPerformed
         connectTagDialog.setVisible(true);
     }//GEN-LAST:event_connectTagsMenuItemActionPerformed
+
+    private void jMenuItem1ActionPerformed(ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        MoteTrackConfiguration configuration = new MoteTrackConfiguration("../MoteTrack/config/Trainingsuebungen.ini");
+        configuration.loadConfiguration();
+        Position pos = configuration.getCalibrationData();
+
+        String[] filterids = configuration.getTagFilter();
+        connectToServerDialog.setTagIdFilter(filterids);
+
+        HashMap<String, ArrayList<String>> connections = configuration.getConnectedTags();
+        SensorData.setConnectedTags(connections);
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**
      * Called from within initComponents().
@@ -488,6 +521,13 @@ public class MoteTrackApp extends JFrame {
         }
     };
 
+    private ChangeListener maxHistoryReadingsSpinnerChangeListener = new ChangeListener() {
+
+        public void stateChanged(ChangeEvent e) {
+            renderer.setMaxHistoryReadings(Integer.parseInt(maxHistoryReadingsSpinner.getValue().toString()));
+        }
+    };
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JCheckBox beacon2dCheckBox;
@@ -499,9 +539,11 @@ public class MoteTrackApp extends JFrame {
     private JMenuItem exitMenuItem;
     private JMenu fileMenu;
     private JCheckBox historyCheckBox;
+    private JLabel jLabel1;
     private JMenuBar jMenuBar1;
     private JMenuItem jMenuItem1;
     private JMenuItem jMenuItem2;
+    private JSpinner maxHistoryReadingsSpinner;
     private JLabel maxVelocityLabel;
     private JSpinner maxVelocitySpinner;
     private JMenu optionsMenu;

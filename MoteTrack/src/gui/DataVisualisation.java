@@ -43,6 +43,11 @@ public class DataVisualisation implements GLEventListener {
     private ArrayList<String> selectedTag2Ids;
     private double tagSize = 0.2;
     private HashMap<String, SensorData> actualSensorDatas;
+    private int maxHistoryReadings = 20;
+
+    public void setMaxHistoryReadings(int maxHistoryReadings) {
+        this.maxHistoryReadings = maxHistoryReadings;
+    }
 
     public void setDetailedRoomPlan(boolean detailedRoomPlan) {
         this.detailedRoomPlan = detailedRoomPlan;
@@ -654,12 +659,21 @@ public class DataVisualisation implements GLEventListener {
         }
         
         gl.glBegin(GL.GL_LINE_STRIP);
-            for (SensorData actData : data.getHistory()) {
-                Position actPos = actData.getPos();
-                if (actPos != null) {
-                    gl.glVertex3d(actPos.getX(), actPos.getY(), actPos.getZ());
-                }
+
+
+        int historySize = history.size();
+        for (int i = 0, j = historySize-1; j >= 0 && i < maxHistoryReadings; i++, j--) {
+            Position actPos = history.get(j).getPos();
+            if (actPos != null) {
+                gl.glVertex3d(actPos.getX(), actPos.getY(), actPos.getZ());
             }
+        }
+//            for (SensorData actData : data.getHistory()) {
+//                Position actPos = actData.getPos();
+//                if (actPos != null) {
+//                    gl.glVertex3d(actPos.getX(), actPos.getY(), actPos.getZ());
+//                }
+//            }
         gl.glEnd();
 
         gl.glColor3d(1, 1, 1);
