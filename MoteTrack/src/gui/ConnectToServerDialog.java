@@ -98,7 +98,7 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         browseButton = new javax.swing.JButton();
         maxVelocityCheckBox = new javax.swing.JCheckBox();
         maxVelocitySpinner = new javax.swing.JSpinner();
-        jLabel1 = new javax.swing.JLabel();
+        maxVelocityLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Start Server");
@@ -147,9 +147,9 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         normalizeCheckBox.setText("normalize data");
 
         logCheckBox.setText("log data");
-        logCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                logCheckBoxActionPerformed(evt);
+        logCheckBox.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                logCheckBoxStateChanged(evt);
             }
         });
 
@@ -174,16 +174,17 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         });
 
         maxVelocityCheckBox.setText("velocity observer");
-        maxVelocityCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                maxVelocityCheckBoxActionPerformed(evt);
+        maxVelocityCheckBox.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                maxVelocityCheckBoxStateChanged(evt);
             }
         });
 
         maxVelocitySpinner.setEnabled(false);
         maxVelocitySpinner.setValue(100);
 
-        jLabel1.setText("m/s / 100");
+        maxVelocityLabel.setText("m/s / 1000");
+        maxVelocityLabel.setEnabled(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -211,9 +212,9 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(maxVelocitySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel1)
+                                .addComponent(maxVelocityLabel)
                                 .addGap(14, 14, 14))
-                            .addComponent(normalizeCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
+                            .addComponent(normalizeCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, 225, Short.MAX_VALUE)
                             .addComponent(logCheckBox)
                             .addComponent(pathLabel)
                             .addComponent(filenameLabel)
@@ -246,7 +247,7 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(maxVelocityCheckBox)
                             .addComponent(maxVelocitySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel1))
+                            .addComponent(maxVelocityLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(logCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -281,8 +282,6 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
 
     private void connectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_connectButtonActionPerformed
         String ids = simpleListModel.getListEntries().replaceAll("-", "");
-
-        System.out.println(ids);
         String server = serverAddressTextField.getText();
         if (server.length() == 0) {
             JOptionPane.showMessageDialog(this, "You must provide a server address", "Server Address Missing", JOptionPane.ERROR_MESSAGE);
@@ -377,15 +376,6 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_abortButtonActionPerformed
 
-    private void logCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_logCheckBoxActionPerformed
-        boolean on = logCheckBox.isSelected();
-        browseButton.setEnabled(on);
-        pathLabel.setEnabled(on);
-        pathTextField.setEnabled(on);
-        filenameLabel.setEnabled(on);
-        filenameTextField.setEnabled(on);
-    }//GEN-LAST:event_logCheckBoxActionPerformed
-
     private void browseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_browseButtonActionPerformed
         JFileChooser fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -398,11 +388,21 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_browseButtonActionPerformed
 
-    private void maxVelocityCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_maxVelocityCheckBoxActionPerformed
+    private void logCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_logCheckBoxStateChanged
+        boolean on = logCheckBox.isSelected();
+        browseButton.setEnabled(on);
+        pathLabel.setEnabled(on);
+        pathTextField.setEnabled(on);
+        filenameLabel.setEnabled(on);
+        filenameTextField.setEnabled(on);
+    }//GEN-LAST:event_logCheckBoxStateChanged
+
+    private void maxVelocityCheckBoxStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_maxVelocityCheckBoxStateChanged
         boolean selected = maxVelocityCheckBox.isSelected();
         maxVelocitySpinner.setEnabled(selected);
         parent.setMaxVelocitySpinnerEnabled(selected);
-    }//GEN-LAST:event_maxVelocityCheckBoxActionPerformed
+        maxVelocityLabel.setEnabled(selected);
+    }//GEN-LAST:event_maxVelocityCheckBoxStateChanged
 
     private SimpleDateFormat dateFormat;
 
@@ -457,9 +457,9 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
     private javax.swing.JLabel filenameLabel;
     private javax.swing.JTextField filenameTextField;
     private javax.swing.JLabel idLabel;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JCheckBox logCheckBox;
     private javax.swing.JCheckBox maxVelocityCheckBox;
+    private javax.swing.JLabel maxVelocityLabel;
     private javax.swing.JSpinner maxVelocitySpinner;
     private javax.swing.JCheckBox normalizeCheckBox;
     private javax.swing.JLabel pathLabel;
@@ -510,5 +510,33 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
 
     public void setNormalizationPos(Position pos) {
         normalizationPos = pos;
+    }
+
+    public void setNormalizationSelected(boolean selected) {
+        normalizeCheckBox.setSelected(selected);
+    }
+
+    public void setServerAddress(String server) {
+        serverAddressTextField.setText(server);
+    }
+
+    public void setLogFile(String logFile) {
+        filenameTextField.setText(logFile);
+    }
+
+    public void setLogPath(String logPath) {
+        pathTextField.setText(logPath);
+    }
+
+    public void setLogSelected(boolean selected) {
+        logCheckBox.setSelected(selected);
+    }
+
+    public void setMaxVelocity(int maxVelocity) {
+        maxVelocitySpinner.setValue(maxVelocity);
+    }
+
+    public void setMaxVelocitySelected(boolean selected) {
+        maxVelocityCheckBox.setSelected(selected);
     }
 }

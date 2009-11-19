@@ -54,10 +54,10 @@
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="maxVelocitySpinner" min="-2" pref="41" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                              <Component id="maxVelocityLabel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="14" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="normalizeCheckBox" alignment="0" pref="219" max="32767" attributes="1"/>
+                          <Component id="normalizeCheckBox" alignment="0" pref="225" max="32767" attributes="1"/>
                           <Component id="logCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="pathLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="filenameLabel" alignment="0" min="-2" max="-2" attributes="0"/>
@@ -95,7 +95,7 @@
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="maxVelocityCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="maxVelocitySpinner" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="maxVelocityLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="logCheckBox" min="-2" max="-2" attributes="0"/>
@@ -209,7 +209,7 @@
         <Property name="text" type="java.lang.String" value="log data"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="logCheckBoxActionPerformed"/>
+        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="logCheckBoxStateChanged"/>
       </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="pathTextField">
@@ -250,7 +250,7 @@
         <Property name="text" type="java.lang.String" value="velocity observer"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="maxVelocityCheckBoxActionPerformed"/>
+        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="maxVelocityCheckBoxStateChanged"/>
       </Events>
     </Component>
     <Component class="javax.swing.JSpinner" name="maxVelocitySpinner">
@@ -261,9 +261,10 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel1">
+    <Component class="javax.swing.JLabel" name="maxVelocityLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="m/s / 100"/>
+        <Property name="text" type="java.lang.String" value="m/s / 1000"/>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
     </Component>
   </SubComponents>

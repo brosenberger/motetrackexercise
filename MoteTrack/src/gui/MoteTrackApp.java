@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -36,6 +37,7 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -48,6 +50,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
 import misc.MoteTrackConfiguration;
 import misc.TagIdListModel;
 import network.ServerDataReader;
@@ -75,6 +78,7 @@ public class MoteTrackApp extends JFrame {
     private ConnectTagDialog connectTagDialog;
     private TagIdListModel tagIdListModel;
     private VelocityNormalizerDataReader velocityNormalizerDataReader;
+    private MoteTrackConfiguration conf;
 
     private void autoStartReplayServer() {
         startServerDialog.startServer();
@@ -171,8 +175,8 @@ public class MoteTrackApp extends JFrame {
         connectTagsMenuItem = new JMenuItem();
         exitMenuItem = new JMenuItem();
         optionsMenu = new JMenu();
-        jMenuItem2 = new JMenuItem();
-        jMenuItem1 = new JMenuItem();
+        saveConfigMenuItem = new JMenuItem();
+        loadConfigMenuItem = new JMenuItem();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -180,9 +184,9 @@ public class MoteTrackApp extends JFrame {
 
         historyCheckBox.setSelected(true);
         historyCheckBox.setText("draw history");
-        historyCheckBox.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                historyCheckBoxActionPerformed(evt);
+        historyCheckBox.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent evt) {
+                historyCheckBoxStateChanged(evt);
             }
         });
 
@@ -237,7 +241,7 @@ public class MoteTrackApp extends JFrame {
 
         maxVelocitySpinner.setEnabled(false);
 
-        maxVelocityLabel.setText("max velocity im m/s /100");
+        maxVelocityLabel.setText("max velocity im m/s /1000");
         maxVelocityLabel.setEnabled(false);
 
         jLabel1.setText("draw history for last n readings");
@@ -279,16 +283,16 @@ public class MoteTrackApp extends JFrame {
 
         optionsMenu.setText("Options");
 
-        jMenuItem2.setText("Save configuration");
-        optionsMenu.add(jMenuItem2);
+        saveConfigMenuItem.setText("Save configuration");
+        optionsMenu.add(saveConfigMenuItem);
 
-        jMenuItem1.setText("Load configuration");
-        jMenuItem1.addActionListener(new ActionListener() {
+        loadConfigMenuItem.setText("Load configuration");
+        loadConfigMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                loadConfigMenuItemActionPerformed(evt);
             }
         });
-        optionsMenu.add(jMenuItem1);
+        optionsMenu.add(loadConfigMenuItem);
 
         jMenuBar1.add(optionsMenu);
 
@@ -365,10 +369,6 @@ public class MoteTrackApp extends JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void historyCheckBoxActionPerformed(ActionEvent evt) {//GEN-FIRST:event_historyCheckBoxActionPerformed
-        renderer.setDrawHistory(historyCheckBox.isSelected());
-    }//GEN-LAST:event_historyCheckBoxActionPerformed
-
     private void beacon2dCheckBoxActionPerformed(ActionEvent evt) {//GEN-FIRST:event_beacon2dCheckBoxActionPerformed
         renderer.setDraw2dBeachon(beacon2dCheckBox.isSelected());
     }//GEN-LAST:event_beacon2dCheckBoxActionPerformed
@@ -407,17 +407,40 @@ public class MoteTrackApp extends JFrame {
         connectTagDialog.setVisible(true);
     }//GEN-LAST:event_connectTagsMenuItemActionPerformed
 
-    private void jMenuItem1ActionPerformed(ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        MoteTrackConfiguration configuration = new MoteTrackConfiguration("../MoteTrack/config/Trainingsuebungen.ini");
-        configuration.loadConfiguration();
-        Position pos = configuration.getCalibrationData();
+    private void loadConfigMenuItemActionPerformed(ActionEvent evt) {//GEN-FIRST:event_loadConfigMenuItemActionPerformed
+        JFileChooser fc = new JFileChooser();
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.addChoosableFileFilter(new FileFilter() {
 
-        String[] filterids = configuration.getTagFilter();
-        connectToServerDialog.setTagIdFilter(filterids);
+            @Override
+            public boolean accept(File f) {
+                if (f.isDirectory()) return true;
+                String fileName = f.getName();
+                String fileExtension = fileName.substring(fileName.length()-4);
+                return fileExtension.equalsIgnoreCase(".ini");//(parts[parts.length-1].equalsIgnoreCase("ini"));
+            }
 
-        HashMap<String, ArrayList<String>> connections = configuration.getConnectedTags();
-        SensorData.setConnectedTags(connections);
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+            @Override
+            public String getDescription() {
+                return "*.ini - Motion Tracking Configuration Files";
+            }
+        });
+        
+        String workdir = System.getProperty("user.dir");
+        fc.setSelectedFile(new File(workdir));
+        int value = fc.showOpenDialog(this);
+        if (value != JFileChooser.APPROVE_OPTION) {
+           return;
+        }
+        File file = fc.getSelectedFile();
+        conf = new MoteTrackConfiguration(file.getAbsolutePath());
+        conf.loadConfiguration();
+        loadConfiguration();
+    }//GEN-LAST:event_loadConfigMenuItemActionPerformed
+
+    private void historyCheckBoxStateChanged(ChangeEvent evt) {//GEN-FIRST:event_historyCheckBoxStateChanged
+        renderer.setDrawHistory(historyCheckBox.isSelected());
+    }//GEN-LAST:event_historyCheckBoxStateChanged
 
     /**
      * Called from within initComponents().
@@ -516,7 +539,7 @@ public class MoteTrackApp extends JFrame {
 
         public void stateChanged(ChangeEvent e) {
             if (velocityNormalizerDataReader != null) {
-                velocityNormalizerDataReader.setMaxSpeed(Double.parseDouble(maxVelocitySpinner.getValue().toString())/100);
+                velocityNormalizerDataReader.setMaxSpeed(Double.parseDouble(maxVelocitySpinner.getValue().toString())/1000);
             }
         }
     };
@@ -541,14 +564,14 @@ public class MoteTrackApp extends JFrame {
     private JCheckBox historyCheckBox;
     private JLabel jLabel1;
     private JMenuBar jMenuBar1;
-    private JMenuItem jMenuItem1;
-    private JMenuItem jMenuItem2;
+    private JMenuItem loadConfigMenuItem;
     private JSpinner maxHistoryReadingsSpinner;
     private JLabel maxVelocityLabel;
     private JSpinner maxVelocitySpinner;
     private JMenu optionsMenu;
     private JCheckBox planeCheckBox;
     private JButton resetButton;
+    private JMenuItem saveConfigMenuItem;
     private JMenuItem startReplayServerItem;
     private JList tagIdList;
     private JScrollPane tagIdListScrollPane;
@@ -556,12 +579,84 @@ public class MoteTrackApp extends JFrame {
     private JSpinner tagSizeSpinner;
     // End of variables declaration//GEN-END:variables
 
-    public void setSelectedTag1Ids(ArrayList<String> list) {
-        renderer.setSelectedTag1Ids(list);
+    public void setSelectedFromTagIds(ArrayList<String> list) {
+        renderer.setSelectedFromTagIds(list);
     }
 
-    public void setSelectedTag2Ids(ArrayList<String> list) {
-        renderer.setSelectedTag2Ids(list);
+    public void setSelectedToTagIds(ArrayList<String> list) {
+        renderer.setSelectedToTagIds(list);
+    }
+
+    private void loadConfiguration() {
+        Position pos = conf.getCalibrationData();
+        if (pos != null) {
+            connectToServerDialog.setNormalizationPos(pos);
+        }
+
+        String[] filterIds = conf.getTagFilter();
+        if (filterIds != null) {
+            connectToServerDialog.setTagIdFilter(filterIds);
+        }
+
+        HashMap<String, ArrayList<String>> connections = conf.getConnectedTags();
+        SensorData.setConnectedTags(connections);
+
+        try {
+            int maxHistoryReadings = conf.getHistoryReadings();
+            maxHistoryReadingsSpinner.setValue(maxHistoryReadings);
+        } catch (NumberFormatException e) {}
+
+        String file = conf.getReplayFile();
+        if (file != null) {
+            startServerDialog.setReplayFile(file);
+        }
+
+        try {
+            int port = conf.getReplayPort();
+            startServerDialog.setReplayServerPort(port);
+        } catch (NumberFormatException e) {}
+
+        try {
+            int rate = conf.getReplayRate();
+            startServerDialog.setReplayRate(rate);
+        } catch (NumberFormatException e) {}
+        
+        String server = conf.getServer();
+        if (server != null) {
+            connectToServerDialog.setServerAddress(server);
+        }
+
+        boolean drawHistory = conf.drawHistory();
+        historyCheckBox.setSelected(drawHistory);
+
+        boolean log = conf.log();
+        connectToServerDialog.setLogSelected(log);
+
+        String logPath = conf.getlogPath();
+        if (logPath != null) {
+            connectToServerDialog.setLogPath(logPath);
+        }
+
+        String logFile = conf.getLogFile();
+        if (logFile != null) {
+            connectToServerDialog.setLogFile(logFile);
+        }
+
+        try {
+            int maxVelocity = conf.getMaxVelocity();
+            connectToServerDialog.setMaxVelocity(maxVelocity);
+        } catch (NumberFormatException e) {}
+
+        boolean maxVelocityObs = conf.velocityObs();
+        connectToServerDialog.setMaxVelocitySelected(maxVelocityObs);
+
+        boolean normalized = conf.isNormalized();
+        connectToServerDialog.setNormalizationSelected(normalized);
+
+        boolean autoStartServer = conf.autoStartServer();
+        if (autoStartServer) {
+            startServerDialog.startServer();
+        }
     }
 
 }

@@ -51,17 +51,17 @@
             <Property name="text" type="java.lang.String" value="Options"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem2">
+            <MenuItem class="javax.swing.JMenuItem" name="saveConfigMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Save configuration"/>
               </Properties>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem1">
+            <MenuItem class="javax.swing.JMenuItem" name="loadConfigMenuItem">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Load configuration"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem1ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadConfigMenuItemActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>
@@ -190,7 +190,7 @@
         <Property name="text" type="java.lang.String" value="draw history"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="historyCheckBoxActionPerformed"/>
+        <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="historyCheckBoxStateChanged"/>
       </Events>
     </Component>
     <Component class="javax.swing.JCheckBox" name="beacon2dCheckBox">
@@ -273,7 +273,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="maxVelocityLabel">
       <Properties>
-        <Property name="text" type="java.lang.String" value="max velocity im m/s /100"/>
+        <Property name="text" type="java.lang.String" value="max velocity im m/s /1000"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
     </Component>

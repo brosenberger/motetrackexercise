@@ -65,7 +65,11 @@ public class MoteTrackConfiguration {
 		return list;
 	}
 	public String getServer() {
-		return config.get("server").replace('@', ':');
+            String server = config.get("server");
+            if (server != null) {
+                server = server.replace('@', ':');
+            }
+            return server;
 	}
 	public void setServer(String server) {
 		config.put("server", server.replace(':', '@'));
@@ -80,35 +84,141 @@ public class MoteTrackConfiguration {
 		}
 		config.put("filter", whole.substring(1));
 	}
+
+        // REPALY FILE
 	public String getReplayFile() {
 		return config.get("replayFile");
 	}
 	public void setReplayFile(String replayFile) {
 		config.put("replayFile", replayFile);
 	}
+
+
+        // REPLAY RATE
 	public int getReplayRate() {
 		return Integer.parseInt(config.get("replayRate"));
 	}
 	public void setReplayRate(int rate) {
 		config.put("replayRate", rate+"");
 	}
+
+
+        // REPLAY PORT
 	public int getReplayPort() {
 		return Integer.parseInt(config.get("replayPort"));
 	}
 	public void setReplayPort(int port) {
 		config.put("replayPort", port+"");
 	}
+
+
+        // IS NORMALIZED
 	public boolean isNormalized() {
-		return config.get("normalized").compareTo("true")==0;
+            String conf = config.get("normalized");
+            boolean normalized = false;
+            if (conf != null) {
+                normalized = conf.equalsIgnoreCase("true");
+            }
+            return normalized;
 	}
 	public void setNormalized(boolean b) {
-		if (b) config.put("normalized", "true");
-		else config.put("normalized", "false");
+		config.put("normalized", String.valueOf(b));
+	}
+
+
+        // MAX HISTORY READINGS
+	public int getHistoryReadings() {
+            return Integer.parseInt(config.get("maxHistory"));
 	}
 	public void setHistoryReadings(int readings) {
-		config.put("history", readings+"");
+		config.put("maxHistory", readings+"");
 	}
-	public int getHistoryReadings() {
-		return Integer.parseInt(config.get("history"));
+
+
+        // DRAW HISTORY
+        public boolean drawHistory() {
+            String conf = config.get("history");
+            boolean history = false;
+            if (conf != null) {
+                history = conf.equalsIgnoreCase("true");
+            }
+            return history;
+        }
+
+        public void setDrawhistory(boolean drawHistory) {
+            config.put("history", String.valueOf(drawHistory));
+        }
+
+
+        // MAX VELOCITY
+        public int getMaxVelocity() {
+            return Integer.parseInt(config.get("maxVelocity"));
+        }
+
+        public void setMaxVelocity(int maxVelocity) {
+            config.put("maxVelocity", String.valueOf(maxVelocity));
+        }
+
+
+        // VELOCITY OBSERVER
+        public boolean velocityObs() {
+            String conf = config.get("velocityObs");
+            boolean velocityObs = false;
+            if (conf != null) {
+                velocityObs = conf.equalsIgnoreCase("true");
+            }
+            return velocityObs;
+        }
+
+        public void setVelocityObs(boolean enabled) {
+            config.put("velocityObs", String.valueOf(enabled));
+        }
+
+
+        // LOG DATA
+        public boolean log() {
+            String conf = config.get("log");
+            boolean log = false;
+            if (conf != null) {
+                log = conf.equalsIgnoreCase("true");
+            }
+            return log;
+        }
+
+        public void setLog(boolean enabled) {
+            config.put("log", String.valueOf(enabled));
+        }
+
+
+        // LOG FILE
+	public String getLogFile() {
+		return config.get("logFile");
 	}
+	public void setLogFile(String logFile) {
+		config.put("logFile", logFile);
+	}
+
+
+        // LOG PATH
+	public String getlogPath() {
+		return config.get("logPath");
+	}
+	public void setlogPath(String logPath) {
+		config.put("logPath", logPath);
+	}
+
+
+        // autoStartServer
+        public boolean autoStartServer() {
+            String conf = config.get("autoStartServer");
+            boolean autoStartServer = false;
+            if (conf != null) {
+                autoStartServer = conf.equalsIgnoreCase("true");
+            }
+            return autoStartServer;
+        }
+
+        public void autoStartServer(boolean enabled) {
+            config.put("autoStartServer", String.valueOf(enabled));
+        }
 }

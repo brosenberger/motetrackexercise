@@ -65,11 +65,11 @@ public class DataVisualisation implements GLEventListener {
         selectedTagIds = list;
     }
 
-    public void setSelectedTag1Ids(ArrayList<String> list) {
+    public void setSelectedFromTagIds(ArrayList<String> list) {
         selectedTag1Ids = list;
     }
 
-    public void setSelectedTag2Ids(ArrayList<String> list) {
+    public void setSelectedToTagIds(ArrayList<String> list) {
         selectedTag2Ids = list;
     }
 
