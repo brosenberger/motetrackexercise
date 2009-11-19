@@ -70,4 +70,14 @@ public class MoteTrackConfiguration {
 	public void setServer(String server) {
 		config.put("server", server.replace(':', '@'));
 	}
+	public String[] getTagFilter() {
+		return config.get("filter").split(";");
+	}
+	public void setTagFilter(String[] tags) {
+		String whole="";
+		for (int i=0;i<tags.length;i++) {
+			whole+=";"+tags[i];
+		}
+		config.put("filter", whole.substring(1));
+	}
 }
