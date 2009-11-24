@@ -5,6 +5,7 @@ import exceptions.NoPrevDataException;
 import exceptions.WrongIdException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class SensorData {
 	private String id;
@@ -38,6 +39,8 @@ public class SensorData {
 
         private void dataActualice(String id) {
             prevData.put(id, actData.put(id, this));
+            //@Testausgabe
+            System.out.println(SensorData.getPattern());
         }
 
         public ArrayList<SensorData> getHistory() {
@@ -213,6 +216,29 @@ public class SensorData {
         }
 
         return connected;
+    }
+    
+    public static AnglePattern getPattern() {
+    	AnglePattern pattern = new AnglePattern(7);
+    	HashMap<String, ArrayList<String>> connections = SensorData.getConnectedTags();
+    	HashMap<String, SensorData> data = SensorData.getData();
+    	SensorData from, to;
+    	int i=0;
+    	String fromStr;
+    	Iterator<String> itKeys =connections.keySet().iterator();
+    	Iterator<String> itConn;
+    	while (itKeys.hasNext()) {
+    		fromStr = itKeys.next();
+    		from = data.get(fromStr);
+    		if (from == null) continue;
+    		itConn = connections.get(fromStr).iterator();
+    		while (itConn.hasNext()) {
+    			to = data.get(itConn.next());
+    			if (to==null) continue;
+    			pattern.setPatternAt(i++, from.getAngle(to.getPos()));
+    		}
+    	}
+    	return pattern;
     }
 
     public static HashMap<String, ArrayList<String>> getConnectedTags() {
