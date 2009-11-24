@@ -52,7 +52,12 @@ public class MoteTrackConfiguration {
 	public HashMap<String, ArrayList<String>> getConnectedTags() {
 		HashMap<String, ArrayList<String>> list = new HashMap<String, ArrayList<String>>();
 		ArrayList<String> arr;
-		String[] split = config.get("connections").split(";");
+		String[] split;
+		try {
+			split = config.get("connections").split(";");
+		} catch (Exception e) {
+			return list;
+		}
 		String[] line;
 		for (int i=0;i<split.length;i++) {
 			line = split[i].split(",");
@@ -68,14 +73,18 @@ public class MoteTrackConfiguration {
             String server = config.get("server");
             if (server != null) {
                 server = server.replace('@', ':');
-            }
+            } else { server="localhost:5000"; }
             return server;
 	}
 	public void setServer(String server) {
 		config.put("server", server.replace(':', '@'));
 	}
 	public String[] getTagFilter() {
-		return config.get("filter").split(";");
+		try {
+			return config.get("filter").split(";");
+		} catch (Exception e){
+			return null;
+		}
 	}
 	public void setTagFilter(String[] tags) {
 		String whole="";
@@ -96,7 +105,11 @@ public class MoteTrackConfiguration {
 
         // REPLAY RATE
 	public int getReplayRate() {
-		return Integer.parseInt(config.get("replayRate"));
+		try {
+			return Integer.parseInt(config.get("replayRate"));
+		} catch (Exception e) {
+			return 100;
+		}
 	}
 	public void setReplayRate(int rate) {
 		config.put("replayRate", rate+"");
@@ -105,7 +118,11 @@ public class MoteTrackConfiguration {
 
         // REPLAY PORT
 	public int getReplayPort() {
-		return Integer.parseInt(config.get("replayPort"));
+		try {
+			return Integer.parseInt(config.get("replayPort"));
+		} catch (Exception  e) {
+			return 5000;
+		}
 	}
 	public void setReplayPort(int port) {
 		config.put("replayPort", port+"");
@@ -128,7 +145,11 @@ public class MoteTrackConfiguration {
 
         // MAX HISTORY READINGS
 	public int getHistoryReadings() {
-            return Integer.parseInt(config.get("maxHistory"));
+		try {
+			return Integer.parseInt(config.get("maxHistory"));
+		} catch(Exception e) {
+			return 20;
+		}
 	}
 	public void setHistoryReadings(int readings) {
 		config.put("maxHistory", readings+"");
@@ -152,7 +173,11 @@ public class MoteTrackConfiguration {
 
         // MAX VELOCITY
         public int getMaxVelocity() {
-            return Integer.parseInt(config.get("maxVelocity"));
+            try {
+            	return Integer.parseInt(config.get("maxVelocity"));
+            } catch(Exception e) {
+            	return 10;
+            }
         }
 
         public void setMaxVelocity(int maxVelocity) {
