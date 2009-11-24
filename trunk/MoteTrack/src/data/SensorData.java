@@ -6,8 +6,9 @@ import exceptions.WrongIdException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Observable;
 
-public class SensorData {
+public class SensorData extends Observable {
 	private String id;
 	private long timestamp;
 	private Position pos;
@@ -40,7 +41,9 @@ public class SensorData {
         private void dataActualice(String id) {
             prevData.put(id, actData.put(id, this));
             //@Testausgabe
-            System.out.println(SensorData.getPattern());
+            //System.out.println(SensorData.getPattern());
+            this.setChanged();
+            this.notifyObservers(SensorData.getPattern());
         }
 
         public ArrayList<SensorData> getHistory() {
@@ -235,7 +238,7 @@ public class SensorData {
     		while (itConn.hasNext()) {
     			to = data.get(itConn.next());
     			if (to==null) continue;
-    			pattern.setPatternAt(i++, from.getAngle(to.getPos()));
+    			pattern.setPatternAt(i++, Math.toDegrees(from.getAngle(to.getPos())));
     		}
     	}
     	return pattern;
