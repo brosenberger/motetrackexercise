@@ -14,7 +14,7 @@ public class AnglePattern implements Serializable {
 		if (pos>=pattern.length || pos<0) return;
 		pattern[pos]=value;
 	}
-	
+		
 	public double[] getPattern() {
 		return pattern;
 	}
