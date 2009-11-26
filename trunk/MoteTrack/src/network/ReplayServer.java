@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ReplayServer implements Runnable{
     private static final int DEFAULT_PORT = 5000;
@@ -78,7 +80,9 @@ public class ReplayServer implements Runnable{
             PrintWriter out;
             BufferedReader reader;
             String read;
-
+            long lastTimestamp = 0, actTimestamp = 0;
+            Logger log = Logger.getLogger(ReplayServer.class.toString());
+            
             try {
                 reader = new BufferedReader(new FileReader(this.fileName));
                 out = new PrintWriter(this.client.getOutputStream());
@@ -89,6 +93,13 @@ public class ReplayServer implements Runnable{
                         out.println(read);
                         if (rate != -1) {
                             Thread.sleep(rate);
+                        } else if (lastTimestamp != 0) {
+                            actTimestamp = Long.parseLong(read.split(" ")[0]);
+                            System.err.println(actTimestamp-lastTimestamp);
+                            log.log(Level.INFO, String.valueOf(actTimestamp-lastTimestamp));
+
+                            Thread.sleep(actTimestamp-lastTimestamp);
+                            lastTimestamp = actTimestamp;
                         }
                     }
                     reader.close();

@@ -15,9 +15,15 @@ public class SensorData extends Observable {
 
         private static HashMap<String, SensorData> actData = new HashMap<String, SensorData>(),
                                                     prevData = new HashMap<String, SensorData>();
+
+        private static DummyObservable dummyObs = new DummyObservable();
+
 	private ArrayList<SensorData> history;
         private static HashMap<String, ArrayList<String>> connectedTags = new HashMap<String, ArrayList<String>>();
 
+        public static DummyObservable getDummyObs() {
+            return dummyObs;
+        }
 
         public static void setConnectedTags(HashMap<String, ArrayList<String>> connectedTags2) {
             connectedTags = connectedTags2;
@@ -42,8 +48,7 @@ public class SensorData extends Observable {
             prevData.put(id, actData.put(id, this));
             //@Testausgabe
             //System.out.println(SensorData.getPattern());
-            this.setChanged();
-            this.notifyObservers(SensorData.getPattern());
+            dummyObs.setObjectChanged(SensorData.getPattern());
         }
 
         public ArrayList<SensorData> getHistory() {
