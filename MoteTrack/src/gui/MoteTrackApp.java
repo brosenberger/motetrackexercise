@@ -52,9 +52,11 @@ import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import misc.MoteTrackConfiguration;
-import misc.TagIdListModel;
+import models.TagIdListModel;
 import network.ServerDataReader;
 import network.VelocityNormalizerDataReader;
+import misc.PatternRecorder;
+import misc.PatternPool;
 
 /**
  *
@@ -79,6 +81,9 @@ public class MoteTrackApp extends JFrame {
     private TagIdListModel tagIdListModel;
     private VelocityNormalizerDataReader velocityNormalizerDataReader;
     private MoteTrackConfiguration conf;
+    private LoggerFrame loggerFrame;
+    private PatternRecorder patternRecorder;
+    private PatternPool patternPool;
 
     private void autoStartReplayServer() {
         startServerDialog.startServer();
@@ -90,13 +95,18 @@ public class MoteTrackApp extends JFrame {
 
     /** Creates new form MainFrame */
     public MoteTrackApp() {
+        patternPool = new PatternPool();
         tagIdListModel = new TagIdListModel();
-
+        patternRecorder = new PatternRecorder();
+        SensorData.getDummyObs().addObserver(patternRecorder);
+        SensorData.getDummyObs().addObserver(patternPool);
+        
         initComponents();
 
         startServerDialog = new StartReplayServerDialog(this, true);
         connectToServerDialog = new ConnectToServerDialog(this, true);
         connectTagDialog = new ConnectTagDialog(this, false);
+        loggerFrame = new LoggerFrame();
         maxVelocitySpinner.setValue(connectToServerDialog.getMaxVelocity());
 
         // for debugging only
@@ -168,6 +178,8 @@ public class MoteTrackApp extends JFrame {
         maxVelocityLabel = new JLabel();
         jLabel1 = new JLabel();
         maxHistoryReadingsSpinner = new JSpinner();
+        startRecordButton = new JButton();
+        stopRecordButton = new JButton();
         jMenuBar1 = new JMenuBar();
         fileMenu = new JMenu();
         startReplayServerItem = new JMenuItem();
@@ -177,6 +189,9 @@ public class MoteTrackApp extends JFrame {
         optionsMenu = new JMenu();
         saveConfigMenuItem = new JMenuItem();
         loadConfigMenuItem = new JMenuItem();
+        loadPatternMenuItem = new JMenuItem();
+        windowsMenu = new JMenu();
+        showLoggerFrameMenuItem = new JMenuItem();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -248,6 +263,20 @@ public class MoteTrackApp extends JFrame {
 
         maxHistoryReadingsSpinner.setValue(20);
 
+        startRecordButton.setText("start pattern recording");
+        startRecordButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                startRecordButtonActionPerformed(evt);
+            }
+        });
+
+        stopRecordButton.setText("stop pattern recording");
+        stopRecordButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                stopRecordButtonActionPerformed(evt);
+            }
+        });
+
         fileMenu.setText("File");
 
         startReplayServerItem.setText("Start Replay Server");
@@ -294,7 +323,27 @@ public class MoteTrackApp extends JFrame {
         });
         optionsMenu.add(loadConfigMenuItem);
 
+        loadPatternMenuItem.setText("Load Pattern");
+        loadPatternMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                loadPatternMenuItemActionPerformed(evt);
+            }
+        });
+        optionsMenu.add(loadPatternMenuItem);
+
         jMenuBar1.add(optionsMenu);
+
+        windowsMenu.setText("Windows");
+
+        showLoggerFrameMenuItem.setText("Logger View");
+        showLoggerFrameMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                showLoggerFrameMenuItemActionPerformed(evt);
+            }
+        });
+        windowsMenu.add(showLoggerFrameMenuItem);
+
+        jMenuBar1.add(windowsMenu);
 
         setJMenuBar(jMenuBar1);
 
@@ -326,7 +375,9 @@ public class MoteTrackApp extends JFrame {
                         .addPreferredGap(ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(Alignment.LEADING)
                             .addComponent(maxVelocityLabel)
-                            .addComponent(tagSizeLabel))))
+                            .addComponent(tagSizeLabel)))
+                    .addComponent(startRecordButton)
+                    .addComponent(stopRecordButton))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -355,7 +406,11 @@ public class MoteTrackApp extends JFrame {
                         .addComponent(jLabel1)
                         .addPreferredGap(ComponentPlacement.RELATED)
                         .addComponent(maxHistoryReadingsSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(ComponentPlacement.RELATED, 131, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(startRecordButton)
+                        .addPreferredGap(ComponentPlacement.RELATED)
+                        .addComponent(stopRecordButton)
+                        .addPreferredGap(ComponentPlacement.RELATED, 61, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                             .addComponent(maxVelocitySpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(maxVelocityLabel))
@@ -441,6 +496,34 @@ public class MoteTrackApp extends JFrame {
     private void historyCheckBoxStateChanged(ChangeEvent evt) {//GEN-FIRST:event_historyCheckBoxStateChanged
         renderer.setDrawHistory(historyCheckBox.isSelected());
     }//GEN-LAST:event_historyCheckBoxStateChanged
+
+    private void showLoggerFrameMenuItemActionPerformed(ActionEvent evt) {//GEN-FIRST:event_showLoggerFrameMenuItemActionPerformed
+        loggerFrame.setVisible(true);
+    }//GEN-LAST:event_showLoggerFrameMenuItemActionPerformed
+
+    private void startRecordButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_startRecordButtonActionPerformed
+        patternRecorder.startRecording();
+    }//GEN-LAST:event_startRecordButtonActionPerformed
+
+    private void stopRecordButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_stopRecordButtonActionPerformed
+        patternRecorder.stopRecording();
+    }//GEN-LAST:event_stopRecordButtonActionPerformed
+
+    private void loadPatternMenuItemActionPerformed(ActionEvent evt) {//GEN-FIRST:event_loadPatternMenuItemActionPerformed
+        JFileChooser fc = new JFileChooser();
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+        String workdir = System.getProperty("user.dir");
+        fc.setSelectedFile(new File(workdir));
+
+        int value = fc.showOpenDialog(this);
+        if (value != JFileChooser.APPROVE_OPTION) {
+           return;
+        }
+        File file = fc.getSelectedFile();
+
+        patternPool.loadPattern(file.getAbsolutePath());
+    }//GEN-LAST:event_loadPatternMenuItemActionPerformed
 
     /**
      * Called from within initComponents().
@@ -565,6 +648,7 @@ public class MoteTrackApp extends JFrame {
     private JLabel jLabel1;
     private JMenuBar jMenuBar1;
     private JMenuItem loadConfigMenuItem;
+    private JMenuItem loadPatternMenuItem;
     private JSpinner maxHistoryReadingsSpinner;
     private JLabel maxVelocityLabel;
     private JSpinner maxVelocitySpinner;
@@ -572,11 +656,15 @@ public class MoteTrackApp extends JFrame {
     private JCheckBox planeCheckBox;
     private JButton resetButton;
     private JMenuItem saveConfigMenuItem;
+    private JMenuItem showLoggerFrameMenuItem;
+    private JButton startRecordButton;
     private JMenuItem startReplayServerItem;
+    private JButton stopRecordButton;
     private JList tagIdList;
     private JScrollPane tagIdListScrollPane;
     private JLabel tagSizeLabel;
     private JSpinner tagSizeSpinner;
+    private JMenu windowsMenu;
     // End of variables declaration//GEN-END:variables
 
     public void setSelectedFromTagIds(ArrayList<String> list) {

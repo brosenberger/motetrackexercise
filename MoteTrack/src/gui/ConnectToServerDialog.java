@@ -26,7 +26,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import listener.ConnectionListener;
 import misc.ServerLogger;
-import misc.SimpleListModel;
+import models.SimpleListModel;
 import network.NormalizedServerDataReader;
 import network.ServerDataReader;
 import network.ServerReader;

@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package misc;
+package models;
 
 import data.HistoryCollector;
 import data.SensorData;

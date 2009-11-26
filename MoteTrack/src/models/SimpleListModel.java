@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package misc;
+package models;
 
 import java.util.ArrayList;
 import javax.swing.ListModel;
