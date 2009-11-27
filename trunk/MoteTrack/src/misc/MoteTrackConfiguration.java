@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 import data.Position;
 
@@ -245,5 +246,20 @@ public class MoteTrackConfiguration {
 
         public void autoStartServer(boolean enabled) {
             config.put("autoStartServer", String.valueOf(enabled));
+        }
+        
+        public void setPatternFiles(String[] fileNames) {
+        	String conf ="";
+        	for (int i=0;i<fileNames.length;i++) {
+        		conf+=";"+fileNames[i];
+        	}
+        	config.put("patternFiles", conf.substring(1));
+        }
+        public String[] getPatternFiles() {
+        	try {
+        		return config.get("patternFiles").split(";");
+        	} catch (Exception e) {
+        		return new String[0];
+        	}
         }
 }

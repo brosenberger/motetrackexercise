@@ -13,6 +13,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import data.AnglePattern;
+import data.DummyObservable;
 import data.SensorData;
 
 public class PatternPool extends Observable implements Observer {
@@ -33,7 +34,6 @@ public class PatternPool extends Observable implements Observer {
 			//out = new ObjectOutputStream(new FileOutputStream(fileName,true));
 			Object obj = null;
 			while ((obj=reader.readObject())!=null) {
-				System.out.println("object read: "+obj.toString());
 				if (obj instanceof String) {
 					if (patternName.length()>0) {
 						storeAndActivatePattern(patternName,list);
@@ -50,7 +50,6 @@ public class PatternPool extends Observable implements Observer {
 			}
 		} catch (EOFException e) {
 			System.out.println("pattern "+patternName+" added");
-			System.out.println("end of file reached");
 			storeAndActivatePattern(patternName,list);
 		}	catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -95,7 +94,8 @@ public class PatternPool extends Observable implements Observer {
 	
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		if (arg0 instanceof SensorData) {
+		if (arg0 instanceof DummyObservable) {
+		//	System.out.print("pattern to check, now distributing");
 			this.distributePattern((AnglePattern) arg1);
 		} else if (arg0 instanceof PatternChecker) {
 			this.setChanged();
