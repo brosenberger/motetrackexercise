@@ -21,6 +21,7 @@ public class PatternChecker extends Observable implements Runnable {
 	
 	public void checkPattern(AnglePattern pat) {
 		this.actPattern.addLast(pat);
+	//	System.out.println("add pattern to compare");
 	}
 
 	public void setObservePattern(Object[] array) {
@@ -40,6 +41,7 @@ public class PatternChecker extends Observable implements Runnable {
 	@Override
 	public void run() {
 		AnglePattern toCheck;
+		System.out.println("start checking "+this.patternName);
 		while (run) {
 			if (actPattern.size()>0) {
 				toCheck = actPattern.removeFirst();
@@ -47,6 +49,7 @@ public class PatternChecker extends Observable implements Runnable {
 					if (toCheck.match(observePattern[i])) {
 						this.setChanged();
 						this.notifyObservers(this.patternName);
+						System.out.println("pattern matched "+this.patternName);
 						break;
 					}
 				}

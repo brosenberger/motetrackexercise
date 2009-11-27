@@ -53,6 +53,7 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
         this.parent = parent;
         initComponents();
 
+        setResizable(true);
         maxVelocitySpinner.addChangeListener(maxValueSpinnerChangelistener);
 
         connectionEstablished = false;
