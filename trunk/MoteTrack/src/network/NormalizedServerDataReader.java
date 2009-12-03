@@ -9,18 +9,28 @@ import data.SensorData;
 import exceptions.NoPrevDataException;
 
 public class NormalizedServerDataReader extends Observable implements Observer {
-	private Position calibrationData=null;
+	private volatile Position calibrationData=null;
+	private static NormalizedServerDataReader instance;
 	
-	public NormalizedServerDataReader(Position calibrationData, double addPercent) {
+	public NormalizedServerDataReader(Position calibrationData) {
 		this.calibrationData = calibrationData;
-		this.calibrationData.addPercentage(addPercent);
+		instance = this;
 	}
-	private boolean isWithinRatio(Position last, Position newPos) {
-		if (Math.abs(last.getX()-newPos.getX())>calibrationData.getX()) return false;
-		if (Math.abs(last.getY()-newPos.getY())>calibrationData.getY()) return false;
-		if (Math.abs(last.getZ()-newPos.getZ())>calibrationData.getZ()) return false;
-		return true;
+	
+	public static NormalizedServerDataReader getInstance() {
+		return instance;
 	}
+	
+	private Position update(Position lastPos, Position newPos) {
+		return new Position(lastPos.getX()*(1-calibrationData.getX())+newPos.getX()*calibrationData.getX(),
+				lastPos.getY()*(1-calibrationData.getY())+newPos.getY()*calibrationData.getY(),
+				lastPos.getZ()*(1-calibrationData.getZ())+newPos.getZ()*calibrationData.getZ());
+	}
+	
+	public void setCalibrationData(Position calibration) {
+		calibrationData = calibration;
+	}
+
 	@Override
 	public void update(Observable arg0, Object arg1) {
 		if (!(arg1 instanceof SensorData)) return;
@@ -31,14 +41,9 @@ public class NormalizedServerDataReader extends Observable implements Observer {
 				lastPos = data.getLastPosition();
 				System.out.println("speed: "+data.getVelocity());
 			} catch (NoPrevDataException e) {
-				lastPos = null;
+				lastPos = data.getPos();
 			}
-			if (lastPos==null) {
-				lastPos=data.getPos();
-			}
-			if (isWithinRatio(lastPos, data.getPos())) {
-				data.setPos(lastPos);
-			} 
+			data.setPos(update(lastPos, data.getPos()));
 		}
 		this.setChanged();
 		this.notifyObservers(data);
