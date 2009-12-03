@@ -12,7 +12,10 @@ public class SensorData extends Observable {
 	private String id;
 	private long timestamp;
 	private Position pos;
+        private PositionEnum posEnum;
 
+        private static HashMap<String, PositionEnum> idToEnum = new HashMap<String, PositionEnum>();
+        private static HashMap<PositionEnum, String> enumToId = new HashMap<PositionEnum, String>();
         private static HashMap<String, SensorData> actData = new HashMap<String, SensorData>(),
                                                     prevData = new HashMap<String, SensorData>();
 
@@ -25,8 +28,25 @@ public class SensorData extends Observable {
             return dummyObs;
         }
 
+        public static void setPosEnum(PositionEnum posEnum, String id) {
+            idToEnum.put(id, posEnum);
+            enumToId.put(posEnum, id);
+        }
+
         public static void setConnectedTags(HashMap<String, ArrayList<String>> connectedTags2) {
             connectedTags = connectedTags2;
+        }
+
+        public PositionEnum getPosEnum(String id) {
+            return idToEnum.get(id);
+        }
+
+        public SensorData getSensorData(PositionEnum posEnum) {
+            try {
+                return actData.get(enumToId.get(posEnum));
+            } catch (NullPointerException e) {
+                return null;
+            }
         }
 
 	public SensorData(String id, long timestamp, double x, double y, double z) {
