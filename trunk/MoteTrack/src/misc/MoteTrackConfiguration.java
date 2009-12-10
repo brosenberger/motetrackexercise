@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import data.Position;
+import data.PositionEnum;
 
 public class MoteTrackConfiguration {
 	private Configurator config;
@@ -261,5 +262,44 @@ public class MoteTrackConfiguration {
         	} catch (Exception e) {
         		return new String[0];
         	}
+        }
+        public void setIdEnumMatch(HashMap<String, PositionEnum> map) {
+        	String result="", t;
+        	Iterator<String> it = map.keySet().iterator();
+        	while (it.hasNext()) {
+        		t = it.next();
+        		result+=";"+t+","+map.get(t);
+        	}
+        	config.put("idenummatch", result.substring(1));
+        }
+        public HashMap<String, PositionEnum> getIdEnumMatch() {
+        	HashMap<String, PositionEnum> map = new HashMap<String, PositionEnum>();
+        	String[] split1,split2;
+        	try {
+        		split1=config.get("idenummatch").split(";");
+        	} catch (NullPointerException e) {
+        		return map;
+        	}
+        	for (int i=0;i<split1.length;i++) {
+        		split2 = split1[i].split(",");
+        		if (split2[1].equalsIgnoreCase("leftShoulder")) {
+        			map.put(split2[0], PositionEnum.leftShoulder);
+        		} else if (split2[1].equalsIgnoreCase("rightShoulder")) {
+        			map.put(split2[0], PositionEnum.rightShoulder);        			
+        		} else if (split2[1].equalsIgnoreCase("leftWrist")) {
+        			map.put(split2[0], PositionEnum.leftWrist);
+        		} else if (split2[1].equalsIgnoreCase("rightWrist")) {
+        			map.put(split2[0], PositionEnum.rightWrist);
+        		} else if (split2[1].equalsIgnoreCase("leftAnkle")) {
+        			map.put(split2[0], PositionEnum.leftAnkle);
+        		} else if (split2[1].equalsIgnoreCase("rightAnkle")) {
+        			map.put(split2[0], PositionEnum.rightAnkle);
+        		} else if (split2[1].equalsIgnoreCase("leftHip")) {
+        			map.put(split2[0], PositionEnum.leftHip);
+        		} else if (split2[1].equalsIgnoreCase("rightHip")) {
+        			map.put(split2[0], PositionEnum.rightHip);
+        		}
+        	}
+        	return map;
         }
 }
