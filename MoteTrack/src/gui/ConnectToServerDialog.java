@@ -301,7 +301,7 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
             ServerDataReader newClient = new ServerDataReader(address, port, ids);
             if (normalizeCheckBox.isSelected()) {
                 Position pos = normalizationPos;
-                NormalizedServerDataReader obs = new NormalizedServerDataReader(pos, 1);
+                NormalizedServerDataReader obs = new NormalizedServerDataReader(pos);
                 newClient.addObserver(obs);
             }
 

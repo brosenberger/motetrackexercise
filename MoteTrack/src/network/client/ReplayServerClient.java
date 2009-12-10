@@ -27,7 +27,7 @@ public class ReplayServerClient {
             String fileName = "../MoteTrack/logs/NormalizedReplayLogs/"+System.currentTimeMillis()+".txt";
             System.out.println("Writing results to "+fileName);
             ServerLogger log = new ServerLogger(fileName);
-            NormalizedServerDataReader obs = new NormalizedServerDataReader(new Position(0.15,0.15,0.15),1);
+            NormalizedServerDataReader obs = new NormalizedServerDataReader(new Position(0.15,0.15,0.15));
             ServerDataReader reader = new ServerDataReader("localhost",5000);//,"020000111249;020000136188");
             reader.addObserver(log);
             reader.addObserver(obs);

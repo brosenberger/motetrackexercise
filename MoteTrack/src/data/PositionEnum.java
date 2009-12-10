@@ -15,7 +15,8 @@ public enum PositionEnum {
     rightShoulder,
     leftWrist,
     rightWrist,
-    hip,
+    leftHip,
+    rightHip,
     leftAnkle,
     rightAnkle
 }
