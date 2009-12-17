@@ -24,6 +24,22 @@ public class SensorData extends Observable {
 	private ArrayList<SensorData> history;
         private static HashMap<String, ArrayList<String>> connectedTags = new HashMap<String, ArrayList<String>>();
 
+        public SensorData getSensorData(PositionEnum posEnum) {
+            try {
+                return actData.get(enumToId.get(posEnum));
+            } catch (NullPointerException e) {
+                return null;
+            }
+        }
+
+	public SensorData(String id, long timestamp, double x, double y, double z) {
+		this.id = id;
+		this.timestamp = timestamp;
+		pos = new Position(x, y, z);
+                posEnum = idToEnum.get(id);
+                dataActualice(id);
+	}
+
         public static DummyObservable getDummyObs() {
             return dummyObs;
         }
@@ -37,30 +53,20 @@ public class SensorData extends Observable {
             connectedTags = connectedTags2;
         }
 
-        public PositionEnum getPosEnum(String id) {
+        public static PositionEnum getPosEnum(String id) {
             return idToEnum.get(id);
         }
 
-        public SensorData getSensorData(PositionEnum posEnum) {
-            try {
-                return actData.get(enumToId.get(posEnum));
-            } catch (NullPointerException e) {
-                return null;
-            }
+        public PositionEnum getPosEnum() {
+            return posEnum;
         }
-
-	public SensorData(String id, long timestamp, double x, double y, double z) {
-		this.id = id;
-		this.timestamp = timestamp;
-		pos = new Position(x, y, z);
-                dataActualice(id);
-	}
 
         public SensorData(String sensorData) {
             String[] splitData = sensorData.split(" ");
             id = splitData[0];
             timestamp = Long.parseLong(splitData[1]);
             pos = new Position(Double.parseDouble(splitData[2]), Double.parseDouble(splitData[3]), Double.parseDouble(splitData[4]));
+            posEnum = idToEnum.get(id);
             dataActualice(id);
         }
 

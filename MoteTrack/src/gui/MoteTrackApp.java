@@ -57,6 +57,7 @@ import network.ServerDataReader;
 import network.VelocityNormalizerDataReader;
 import misc.PatternRecorder;
 import misc.PatternPool;
+import network.NormalizedServerDataReader;
 
 /**
  *
@@ -116,6 +117,7 @@ public class MoteTrackApp extends JFrame {
         tagIdList.addListSelectionListener(listSelectionListener);
         maxVelocitySpinner.addChangeListener(maxVelocitySpinnerChangeListener);
         maxHistoryReadingsSpinner.addChangeListener(maxHistoryReadingsSpinnerChangeListener);
+        calibrationSpinner.addChangeListener(calibrationSpinnerChangeListener);
 
 
         setTitle("Motion Tracking Application");
@@ -180,6 +182,7 @@ public class MoteTrackApp extends JFrame {
         maxHistoryReadingsSpinner = new JSpinner();
         startRecordButton = new JButton();
         stopRecordButton = new JButton();
+        calibrationSpinner = new JSpinner();
         jMenuBar1 = new JMenuBar();
         fileMenu = new JMenu();
         startReplayServerItem = new JMenuItem();
@@ -277,6 +280,8 @@ public class MoteTrackApp extends JFrame {
             }
         });
 
+        calibrationSpinner.setValue(5);
+
         fileMenu.setText("File");
 
         startReplayServerItem.setText("Start Replay Server");
@@ -313,6 +318,11 @@ public class MoteTrackApp extends JFrame {
         optionsMenu.setText("Options");
 
         saveConfigMenuItem.setText("Save configuration");
+        saveConfigMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                saveConfigMenuItemActionPerformed(evt);
+            }
+        });
         optionsMenu.add(saveConfigMenuItem);
 
         loadConfigMenuItem.setText("Load configuration");
@@ -357,7 +367,7 @@ public class MoteTrackApp extends JFrame {
                     .addComponent(tagIdListLabel)
                     .addComponent(tagIdListScrollPane, GroupLayout.PREFERRED_SIZE, 146, GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(ComponentPlacement.RELATED)
-                .addComponent(canvas, GroupLayout.DEFAULT_SIZE, 559, Short.MAX_VALUE)
+                .addComponent(canvas, GroupLayout.DEFAULT_SIZE, 567, Short.MAX_VALUE)
                 .addPreferredGap(ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(Alignment.LEADING)
                     .addComponent(planeCheckBox)
@@ -366,18 +376,21 @@ public class MoteTrackApp extends JFrame {
                     .addComponent(resetButton)
                     .addComponent(drawAxesCheckBox)
                     .addComponent(detailedRoomPlanCheckBox)
-                    .addComponent(jLabel1)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.TRAILING, false)
-                            .addComponent(maxHistoryReadingsSpinner, Alignment.LEADING)
                             .addComponent(maxVelocitySpinner, Alignment.LEADING)
                             .addComponent(tagSizeSpinner, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE))
                         .addPreferredGap(ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(Alignment.LEADING)
                             .addComponent(maxVelocityLabel)
                             .addComponent(tagSizeLabel)))
+                    .addComponent(jLabel1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(maxHistoryReadingsSpinner, GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
+                        .addGap(110, 110, 110))
                     .addComponent(startRecordButton)
-                    .addComponent(stopRecordButton))
+                    .addComponent(stopRecordButton)
+                    .addComponent(calibrationSpinner, GroupLayout.PREFERRED_SIZE, 67, GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -402,7 +415,7 @@ public class MoteTrackApp extends JFrame {
                         .addComponent(drawAxesCheckBox)
                         .addPreferredGap(ComponentPlacement.RELATED)
                         .addComponent(detailedRoomPlanCheckBox)
-                        .addGap(80, 80, 80)
+                        .addGap(18, 18, 18)
                         .addComponent(jLabel1)
                         .addPreferredGap(ComponentPlacement.RELATED)
                         .addComponent(maxHistoryReadingsSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -410,7 +423,9 @@ public class MoteTrackApp extends JFrame {
                         .addComponent(startRecordButton)
                         .addPreferredGap(ComponentPlacement.RELATED)
                         .addComponent(stopRecordButton)
-                        .addPreferredGap(ComponentPlacement.RELATED, 61, Short.MAX_VALUE)
+                        .addPreferredGap(ComponentPlacement.UNRELATED)
+                        .addComponent(calibrationSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(ComponentPlacement.RELATED, 92, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                             .addComponent(maxVelocitySpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addComponent(maxVelocityLabel))
@@ -525,6 +540,10 @@ public class MoteTrackApp extends JFrame {
         patternPool.loadPattern(file.getAbsolutePath());
     }//GEN-LAST:event_loadPatternMenuItemActionPerformed
 
+    private void saveConfigMenuItemActionPerformed(ActionEvent evt) {//GEN-FIRST:event_saveConfigMenuItemActionPerformed
+
+    }//GEN-LAST:event_saveConfigMenuItemActionPerformed
+
     /**
      * Called from within initComponents().
      * hint: to customize the generated code choose 'Customize Code' in the contextmenu
@@ -634,9 +653,18 @@ public class MoteTrackApp extends JFrame {
         }
     };
 
+    private ChangeListener calibrationSpinnerChangeListener = new ChangeListener() {
+
+        public void stateChanged(ChangeEvent e) {
+            double val = (Double.parseDouble(calibrationSpinner.getValue().toString()))/10;
+            NormalizedServerDataReader.getInstance().setCalibrationData(new Position(val, val, val));
+        }
+    };
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private JCheckBox beacon2dCheckBox;
+    private JSpinner calibrationSpinner;
     private GLCanvas canvas;
     private JMenuItem connectMenuItem;
     private JMenuItem connectTagsMenuItem;
