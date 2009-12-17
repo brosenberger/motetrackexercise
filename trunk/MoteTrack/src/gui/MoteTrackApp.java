@@ -17,6 +17,7 @@ import javax.swing.event.ListSelectionEvent;
 import com.sun.opengl.util.Animator;
 import data.HistoryCollector;
 import data.Position;
+import data.PositionEnum;
 import data.SensorData;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -541,7 +542,7 @@ public class MoteTrackApp extends JFrame {
     }//GEN-LAST:event_loadPatternMenuItemActionPerformed
 
     private void saveConfigMenuItemActionPerformed(ActionEvent evt) {//GEN-FIRST:event_saveConfigMenuItemActionPerformed
-
+//        conf.set
     }//GEN-LAST:event_saveConfigMenuItemActionPerformed
 
     /**
@@ -714,8 +715,8 @@ public class MoteTrackApp extends JFrame {
             connectToServerDialog.setTagIdFilter(filterIds);
         }
 
-        HashMap<String, ArrayList<String>> connections = conf.getConnectedTags();
-        SensorData.setConnectedTags(connections);
+//        HashMap<String, ArrayList<String>> connections = conf.getConnectedTags();
+//        SensorData.setConnectedTags(connections);
 
         try {
             int maxHistoryReadings = conf.getHistoryReadings();
@@ -773,6 +774,9 @@ public class MoteTrackApp extends JFrame {
         if (autoStartServer) {
             startServerDialog.startServer();
         }
+
+        HashMap<String, PositionEnum> idsToEnum = conf.getIdEnumMatch();
+        SensorData.setPosEnum(idsToEnum);
     }
 
 }
