@@ -39,7 +39,7 @@ public class NormalizedServerDataReader extends Observable implements Observer {
 		if (calibrationData!=null) {
 			try {
 				lastPos = data.getLastPosition();
-				System.out.println("speed: "+data.getVelocity());
+//				System.out.println("speed: "+data.getVelocity());
 			} catch (NoPrevDataException e) {
 				lastPos = data.getPos();
 			}

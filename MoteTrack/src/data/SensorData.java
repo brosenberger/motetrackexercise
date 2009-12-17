@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Observable;
+import java.util.Set;
 
 public class SensorData extends Observable {
 	private String id;
@@ -47,6 +48,34 @@ public class SensorData extends Observable {
         public static void setPosEnum(PositionEnum posEnum, String id) {
             idToEnum.put(id, posEnum);
             enumToId.put(posEnum, id);
+        }
+
+        public static void setPosEnum(HashMap<String, PositionEnum> idsToEnum) {
+            Set<String> keys = idsToEnum.keySet();
+            for (String key : keys) {
+                setPosEnum(idsToEnum.get(key), key);
+            }
+
+            // Adding connections between tags based on Position Enums
+            HashMap<String, ArrayList<String>> connections = new HashMap<String, ArrayList<String>>();
+            ArrayList<String> list = new ArrayList<String>();
+            list.add(enumToId.get(PositionEnum.leftWrist));
+            list.add(enumToId.get(PositionEnum.leftHip));
+            list.add(enumToId.get(PositionEnum.rightShoulder));
+            connections.put(enumToId.get(PositionEnum.leftShoulder), list);
+            list = new ArrayList<String>();
+            list.add(enumToId.get(PositionEnum.leftAnkle));
+            list.add(enumToId.get(PositionEnum.rightHip));
+            connections.put(enumToId.get(PositionEnum.leftHip), list);
+            list = new ArrayList<String>();
+            list.add(enumToId.get(PositionEnum.rightAnkle));
+            list.add(enumToId.get(PositionEnum.rightShoulder));
+            connections.put(enumToId.get(PositionEnum.rightHip), list);
+            list = new ArrayList<String>();
+            list.add(enumToId.get(PositionEnum.rightWrist));
+            connections.put(enumToId.get(PositionEnum.rightShoulder), list);
+
+            setConnectedTags(connections);
         }
 
         public static void setConnectedTags(HashMap<String, ArrayList<String>> connectedTags2) {
