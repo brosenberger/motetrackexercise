@@ -55,6 +55,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Save configuration"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="saveConfigMenuItemActionPerformed"/>
+              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="loadConfigMenuItem">
               <Properties>
@@ -121,7 +124,7 @@
                   <Component id="tagIdListScrollPane" min="-2" pref="146" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="canvas" pref="559" max="32767" attributes="0"/>
+              <Component id="canvas" pref="567" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="planeCheckBox" min="-2" max="-2" attributes="0"/>
@@ -130,10 +133,8 @@
                   <Component id="resetButton" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="drawAxesCheckBox" min="-2" max="-2" attributes="0"/>
                   <Component id="detailedRoomPlanCheckBox" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="1" max="-2" attributes="0">
-                          <Component id="maxHistoryReadingsSpinner" alignment="0" max="32767" attributes="1"/>
                           <Component id="maxVelocitySpinner" alignment="0" max="32767" attributes="1"/>
                           <Component id="tagSizeSpinner" alignment="0" pref="40" max="32767" attributes="1"/>
                       </Group>
@@ -143,8 +144,14 @@
                           <Component id="tagSizeLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
+                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="maxHistoryReadingsSpinner" pref="68" max="32767" attributes="1"/>
+                      <EmptySpace min="110" pref="110" max="110" attributes="0"/>
+                  </Group>
                   <Component id="startRecordButton" min="-2" max="-2" attributes="0"/>
                   <Component id="stopRecordButton" min="-2" max="-2" attributes="0"/>
+                  <Component id="calibrationSpinner" alignment="0" min="-2" pref="67" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -173,7 +180,7 @@
                       <Component id="drawAxesCheckBox" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="detailedRoomPlanCheckBox" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="80" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="maxHistoryReadingsSpinner" min="-2" max="-2" attributes="0"/>
@@ -181,7 +188,9 @@
                       <Component id="startRecordButton" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="stopRecordButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="61" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="calibrationSpinner" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="92" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="maxVelocitySpinner" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="maxVelocityLabel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -333,6 +342,13 @@
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="stopRecordButtonActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JSpinner" name="calibrationSpinner">
+      <Properties>
+        <Property name="value" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="5" type="code"/>
+        </Property>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>
