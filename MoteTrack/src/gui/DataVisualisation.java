@@ -172,7 +172,7 @@ public class DataVisualisation implements GLEventListener {
         gl.glTranslated(old_rotx, old_roty, old_rotz);
         moveAbsolute(gl);
 
-        gl.glTranslated(0 , -1.8, -10);
+        gl.glTranslated(-4 , -1.8, -10);
         gl.glRotated(-90, 1, 0, 0);
         gl.glTranslated(-7, -3.5, 0);
 

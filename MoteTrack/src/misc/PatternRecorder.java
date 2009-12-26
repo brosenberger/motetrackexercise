@@ -1,10 +1,8 @@
 package misc;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -16,6 +14,12 @@ import javax.swing.JOptionPane;
 import data.AnglePattern;
 
 public class PatternRecorder implements Observer {
+    
+    public static final int STARTED_RECORDING = 0;
+    public static final int ALREADY_RECORDING = 1;
+    public static final int SAVING_IN_PROGRESS = 2;
+
+
 	private LinkedList<AnglePattern> list;
 	private volatile boolean record=false;
 	private volatile boolean saved=true;
@@ -24,19 +28,21 @@ public class PatternRecorder implements Observer {
 		list = new LinkedList<AnglePattern>();
 	}
 	
-	public void startRecording() {
-		if (record) return;
-		if (!record && !saved) return;
+	public int startRecording() {
+		if (record) return ALREADY_RECORDING;
+		if (!record && !saved) return SAVING_IN_PROGRESS;
 		record = true;
 		saved = false;
+                return STARTED_RECORDING;
 	}
 	
 	public void stopRecording() {
 		record=false;
 		ObjectOutputStream writer;
-		String fileName = JOptionPane.showInputDialog(null,"Enter filename where pattern should be stored","Enter filename", JOptionPane.QUESTION_MESSAGE);
-		String patternName = JOptionPane.showInputDialog(null,"Enter pattern Name","patter name",JOptionPane.QUESTION_MESSAGE);
-		try {
+		//String fileName = JOptionPane.showInputDialog(null,"Enter filename where pattern should be stored","Enter filename", JOptionPane.QUESTION_MESSAGE);
+		String patternName = JOptionPane.showInputDialog(null,"Enter pattern Name (file name will be '<pattern name>.ap'","patter name",JOptionPane.QUESTION_MESSAGE);
+		String fileName = patternName+".ap";
+                try {
 			writer = new ObjectOutputStream(new FileOutputStream("./patterns/"+fileName,true));
 			writer.writeObject(patternName);
 			System.out.println("wrote patternname "+patternName);

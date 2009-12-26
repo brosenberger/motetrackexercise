@@ -82,7 +82,8 @@ public class SensorData extends Observable {
             connectedTags = connectedTags2;
         }
 
-        public static PositionEnum getPosEnum(String id) {
+        public static PositionEnum getPosEnum(String id) throws IllegalTagIdFormatException {
+            id = SensorData.formatId(id, true);
             return idToEnum.get(id);
         }
 

@@ -46,6 +46,7 @@ public class PatternPool extends Observable implements Observer {
 					}
 				}else if (obj instanceof AnglePattern) {
 					list.add((AnglePattern) obj);
+                                        System.out.println("Angle Pattern: "+((AnglePattern) obj).toString());
 				}
 			}
 		} catch (EOFException e) {
