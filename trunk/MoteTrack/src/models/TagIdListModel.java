@@ -26,15 +26,22 @@ public class TagIdListModel implements ListModel {
     private ArrayList<String> tagIds;
     private HistoryCollector hc;
 
+    private boolean showEnums;
+
 
     public TagIdListModel() {
         listeners = new ArrayList<ListDataListener>();
         tagIds = new ArrayList<String>();
+        showEnums = true;
     }
     
     public TagIdListModel(HistoryCollector hc) {
         listeners = new ArrayList<ListDataListener>();
         setHistorycollector(hc);
+    }
+
+    public void setShowEnums(boolean showEnums) {
+        this.showEnums = showEnums;
     }
 
     public void setHistorycollector(HistoryCollector hc) {
@@ -44,7 +51,14 @@ public class TagIdListModel implements ListModel {
         this.hc = hc;
         hc.addListener(hcl);
         try {
-            tagIds = SensorData.format(hc.getTagids(), false);
+            ArrayList<String> list = SensorData.format(hc.getTagids(), false);
+            tagIds = new ArrayList<String>();
+            for (String id : list) {
+                String enumVal = SensorData.getPosEnum(id).toString();
+                String entry = (enumVal.equals("null")?id:id+"@"+enumVal);
+                tagIds.add(entry);
+            }
+            fireListDataListeners(getSize());
         } catch (IllegalTagIdFormatException ex) {
             tagIds = new ArrayList<String>();
             String msg = "Tag Id Format Exception occured while setting HistoryCollector - ID: "+ex.getIllegalTagId();
@@ -59,8 +73,9 @@ public class TagIdListModel implements ListModel {
                 if (source == hc) {
                     try {
                         id = SensorData.formatId(id, false);
-                        tagIds.add(id);
-                        fireListDataListeners(tagIds.indexOf(id));
+                        String entry = id+"@"+SensorData.getPosEnum(id);
+                        tagIds.add(entry);
+                        fireListDataListeners(tagIds.indexOf(entry));
                     } catch (IllegalTagIdFormatException ex) {
                         String msg = "Tag Id Format Exception occured while handling newTagId event - ID: "+ex.getIllegalTagId();
                         System.err.println(msg);
@@ -79,10 +94,22 @@ public class TagIdListModel implements ListModel {
         return tagIds.get(index);
     }
 
+    public String getIdAt(int index) {
+        return tagIds.get(index).split("@")[0];
+    }
+
     public ArrayList<String> getElementsAt(int[] indices) {
         ArrayList<String> elements = new ArrayList<String>();
         for (int i : indices) {
             elements.add(getElementAt(i));
+        }
+        return elements;
+    }
+
+    public ArrayList<String> getIdsAt(int[] indices) {
+        ArrayList<String> elements = new ArrayList<String>();
+        for (int i : indices) {
+            elements.add(getIdAt(i));
         }
         return elements;
     }

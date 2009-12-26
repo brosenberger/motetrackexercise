@@ -11,6 +11,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import javax.swing.JSpinner;
 import javax.swing.KeyStroke;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -45,6 +46,7 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -87,6 +89,8 @@ public class MoteTrackApp extends JFrame {
     private PatternRecorder patternRecorder;
     private PatternPool patternPool;
 
+    private SpinnerNumberModel historySpinnerModel, maxVelocitySpinnerModel, tagSizeSpinnerModel;
+
     private void autoStartReplayServer() {
         startServerDialog.startServer();
     }
@@ -97,6 +101,10 @@ public class MoteTrackApp extends JFrame {
 
     /** Creates new form MainFrame */
     public MoteTrackApp() {
+        historySpinnerModel = new SpinnerNumberModel(5, 0, 2000, 1);
+        maxVelocitySpinnerModel = new SpinnerNumberModel(0.005, 0, 1, 0.001);
+        tagSizeSpinnerModel = new SpinnerNumberModel(2, 0, 10, 1);
+
         patternPool = new PatternPool();
         tagIdListModel = new TagIdListModel();
         patternRecorder = new PatternRecorder();
@@ -234,6 +242,7 @@ public class MoteTrackApp extends JFrame {
             }
         });
 
+        tagSizeSpinner.setModel(tagSizeSpinnerModel);
         tagSizeSpinner.setValue(new Integer(2));
         tagSizeSpinner.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent evt) {
@@ -258,13 +267,15 @@ public class MoteTrackApp extends JFrame {
             }
         });
 
+        maxVelocitySpinner.setModel(maxVelocitySpinnerModel);
         maxVelocitySpinner.setEnabled(false);
 
-        maxVelocityLabel.setText("max velocity im m/s /1000");
+        maxVelocityLabel.setText("max velocity im m/s");
         maxVelocityLabel.setEnabled(false);
 
         jLabel1.setText("draw history for last n readings");
 
+        maxHistoryReadingsSpinner.setModel(historySpinnerModel);
         maxHistoryReadingsSpinner.setValue(20);
 
         startRecordButton.setText("start pattern recording");
@@ -366,9 +377,9 @@ public class MoteTrackApp extends JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(Alignment.LEADING)
                     .addComponent(tagIdListLabel)
-                    .addComponent(tagIdListScrollPane, GroupLayout.PREFERRED_SIZE, 146, GroupLayout.PREFERRED_SIZE))
+                    .addComponent(tagIdListScrollPane, GroupLayout.PREFERRED_SIZE, 162, GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(ComponentPlacement.RELATED)
-                .addComponent(canvas, GroupLayout.DEFAULT_SIZE, 567, Short.MAX_VALUE)
+                .addComponent(canvas, GroupLayout.PREFERRED_SIZE, 551, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(Alignment.LEADING)
                     .addComponent(planeCheckBox)
@@ -378,20 +389,19 @@ public class MoteTrackApp extends JFrame {
                     .addComponent(drawAxesCheckBox)
                     .addComponent(detailedRoomPlanCheckBox)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(Alignment.TRAILING, false)
-                            .addComponent(maxVelocitySpinner, Alignment.LEADING)
-                            .addComponent(tagSizeSpinner, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE))
+                        .addComponent(tagSizeSpinner, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                            .addComponent(maxVelocityLabel)
-                            .addComponent(tagSizeLabel)))
+                        .addComponent(tagSizeLabel)
+                        .addGap(19, 19, 19))
                     .addComponent(jLabel1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(maxHistoryReadingsSpinner, GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
                         .addGap(110, 110, 110))
                     .addComponent(startRecordButton)
                     .addComponent(stopRecordButton)
-                    .addComponent(calibrationSpinner, GroupLayout.PREFERRED_SIZE, 67, GroupLayout.PREFERRED_SIZE))
+                    .addComponent(calibrationSpinner, GroupLayout.PREFERRED_SIZE, 67, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(maxVelocityLabel)
+                    .addComponent(maxVelocitySpinner, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -426,10 +436,10 @@ public class MoteTrackApp extends JFrame {
                         .addComponent(stopRecordButton)
                         .addPreferredGap(ComponentPlacement.UNRELATED)
                         .addComponent(calibrationSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(ComponentPlacement.RELATED, 92, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                            .addComponent(maxVelocitySpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(maxVelocityLabel))
+                        .addPreferredGap(ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
+                        .addComponent(maxVelocityLabel)
+                        .addPreferredGap(ComponentPlacement.RELATED)
+                        .addComponent(maxVelocitySpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                             .addComponent(tagSizeSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -518,7 +528,19 @@ public class MoteTrackApp extends JFrame {
     }//GEN-LAST:event_showLoggerFrameMenuItemActionPerformed
 
     private void startRecordButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_startRecordButtonActionPerformed
-        patternRecorder.startRecording();
+        switch (patternRecorder.startRecording()) {
+            case PatternRecorder.STARTED_RECORDING:
+                JOptionPane.showMessageDialog(this, "Recording started.", "RECORDING STARTED", JOptionPane.INFORMATION_MESSAGE);
+                break;
+            case PatternRecorder.ALREADY_RECORDING:
+                JOptionPane.showMessageDialog(this, "startRecording() returned with error ALREADY RECORDING", "ALREADY RECORDING", JOptionPane.ERROR_MESSAGE);
+                break;
+            case PatternRecorder.SAVING_IN_PROGRESS:
+                JOptionPane.showMessageDialog(this, "startRecording() returned with error SAVING IN PROGRESS", "SAVING IN PROGRESS", JOptionPane.ERROR_MESSAGE);
+                break;
+            default:
+                JOptionPane.showMessageDialog(this, "Unknown return value of startRecording()", "UNKNOWN RETURN VALUE", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_startRecordButtonActionPerformed
 
     private void stopRecordButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_stopRecordButtonActionPerformed
@@ -602,7 +624,7 @@ public class MoteTrackApp extends JFrame {
             Object[] selectedIds = tagIdList.getSelectedValues();
             ArrayList<String> selectedIdsList = new ArrayList<String>();
             for (Object id : selectedIds) {
-                selectedIdsList.add((String)id);
+                selectedIdsList.add(((String)id).split("@")[0]);
             }
             try {
                 selectedIdsList = SensorData.format(selectedIdsList, true);
@@ -642,7 +664,7 @@ public class MoteTrackApp extends JFrame {
 
         public void stateChanged(ChangeEvent e) {
             if (velocityNormalizerDataReader != null) {
-                velocityNormalizerDataReader.setMaxSpeed(Double.parseDouble(maxVelocitySpinner.getValue().toString())/1000);
+                velocityNormalizerDataReader.setMaxSpeed(Double.parseDouble(maxVelocitySpinner.getValue().toString()));
             }
         }
     };
@@ -705,11 +727,14 @@ public class MoteTrackApp extends JFrame {
     }
 
     private void loadConfiguration() {
+        // CALIBRATION DATA
         Position pos = conf.getCalibrationData();
         if (pos != null) {
             connectToServerDialog.setNormalizationPos(pos);
         }
 
+
+        // TAG ID FILTER
         String[] filterIds = conf.getTagFilter();
         if (filterIds != null) {
             connectToServerDialog.setTagIdFilter(filterIds);
@@ -718,63 +743,79 @@ public class MoteTrackApp extends JFrame {
 //        HashMap<String, ArrayList<String>> connections = conf.getConnectedTags();
 //        SensorData.setConnectedTags(connections);
 
+
+        // MAX HISTORY READINGS
         try {
             int maxHistoryReadings = conf.getHistoryReadings();
             maxHistoryReadingsSpinner.setValue(maxHistoryReadings);
         } catch (NumberFormatException e) {}
 
+
+        // REPLAY FILE
         String file = conf.getReplayFile();
         if (file != null) {
             startServerDialog.setReplayFile(file);
         }
 
+        // REPLAY PORT
         try {
             int port = conf.getReplayPort();
             startServerDialog.setReplayServerPort(port);
         } catch (NumberFormatException e) {}
 
+        // REPLAY RATE
         try {
             int rate = conf.getReplayRate();
             startServerDialog.setReplayRate(rate);
         } catch (NumberFormatException e) {}
-        
+
+        // SERVER ADDRESS
         String server = conf.getServer();
         if (server != null) {
             connectToServerDialog.setServerAddress(server);
         }
 
+        // HISTORY ENABLED
         boolean drawHistory = conf.drawHistory();
         historyCheckBox.setSelected(drawHistory);
 
+        // LOG ENABLED
         boolean log = conf.log();
         connectToServerDialog.setLogSelected(log);
 
+        // LOG PATH
         String logPath = conf.getlogPath();
         if (logPath != null) {
             connectToServerDialog.setLogPath(logPath);
         }
 
+        // LOG NAME
         String logFile = conf.getLogFile();
         if (logFile != null) {
             connectToServerDialog.setLogFile(logFile);
         }
 
+        // MAY VELOCITY
         try {
             int maxVelocity = conf.getMaxVelocity();
             connectToServerDialog.setMaxVelocity(maxVelocity);
         } catch (NumberFormatException e) {}
 
+        // MAX VELOCITY ENABLED
         boolean maxVelocityObs = conf.velocityObs();
         connectToServerDialog.setMaxVelocitySelected(maxVelocityObs);
 
+        // NORMALIZE DATA ENABLED
         boolean normalized = conf.isNormalized();
         connectToServerDialog.setNormalizationSelected(normalized);
 
+        // AUTO START SERVER ENABLED
         boolean autoStartServer = conf.autoStartServer();
         if (autoStartServer) {
             startServerDialog.startServer();
         }
 
+        // ID TO ENUM MAPPING
         HashMap<String, PositionEnum> idsToEnum = conf.getIdEnumMatch();
         SensorData.setPosEnum(idsToEnum);
     }

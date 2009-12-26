@@ -1,8 +1,10 @@
 package network;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -78,33 +80,41 @@ public class ReplayServer implements Runnable{
         @Override
         public void run() {
             PrintWriter out;
+            BufferedWriter sleepLog;
             BufferedReader reader;
             String read;
             long lastTimestamp = 0, actTimestamp = 0;
-            Logger log = Logger.getLogger(ReplayServer.class.toString());
-            
+//            Logger log = Logger.getLogger(ReplayServer.class.toString());
             try {
+                sleepLog = new BufferedWriter(new FileWriter("sleepLog.txt"));
                 reader = new BufferedReader(new FileReader(this.fileName));
                 out = new PrintWriter(this.client.getOutputStream());
-                /* die server quittiert jetzt seinen dienst sobald der stream
+                /* der server quittiert jetzt seinen dienst sobald der stream
                  * einen error hatte - thomas */
                 while (run && !out.checkError()) {
                     while ((read = reader.readLine()) != null && !out.checkError()) {
                         out.println(read);
                         if (rate != -1) {
                             Thread.sleep(rate);
-                        } else if (lastTimestamp != 0) {
-                            actTimestamp = Long.parseLong(read.split(" ")[0]);
-                            System.err.println(actTimestamp-lastTimestamp);
-                            log.log(Level.INFO, String.valueOf(actTimestamp-lastTimestamp));
-
-                            Thread.sleep(actTimestamp-lastTimestamp);
+                        } else {
+                            actTimestamp = Long.parseLong(read.split(" ")[1]);
+                            if (lastTimestamp != 0) {
+    //                            System.err.println(actTimestamp-lastTimestamp);
+//                                log.log(Level.INFO, String.valueOf(actTimestamp-lastTimestamp));
+                                long sleepTime = actTimestamp-lastTimestamp;
+                                sleepLog.write(sleepTime+"\n");
+                                sleepLog.flush();
+                                if (sleepTime > 0) {
+                                    Thread.sleep(sleepTime);
+                                }
+                            }
                             lastTimestamp = actTimestamp;
                         }
                     }
                     reader.close();
                     reader = new BufferedReader(new FileReader(this.fileName));
                 }
+                sleepLog.close();
                 out.close();
                 client.close();
                 System.out.println("client disconnected ("+id+")");

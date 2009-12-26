@@ -1,6 +1,5 @@
 package network;
 
-import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -22,9 +21,13 @@ public class NormalizedServerDataReader extends Observable implements Observer {
 	}
 	
 	private Position update(Position lastPos, Position newPos) {
-		return new Position(lastPos.getX()*(1-calibrationData.getX())+newPos.getX()*calibrationData.getX(),
-				lastPos.getY()*(1-calibrationData.getY())+newPos.getY()*calibrationData.getY(),
-				lastPos.getZ()*(1-calibrationData.getZ())+newPos.getZ()*calibrationData.getZ());
+            if (lastPos == null) {
+                return newPos;
+            }
+            
+            return new Position(lastPos.getX()*(1-calibrationData.getX())+newPos.getX()*calibrationData.getX(),
+                            lastPos.getY()*(1-calibrationData.getY())+newPos.getY()*calibrationData.getY(),
+                            lastPos.getZ()*(1-calibrationData.getZ())+newPos.getZ()*calibrationData.getZ());
 	}
 	
 	public void setCalibrationData(Position calibration) {

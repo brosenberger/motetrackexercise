@@ -27,8 +27,12 @@ public class Configurator {
 		reader = new BufferedReader(new FileReader(fileName));
 		try {
 			while ((read=reader.readLine())!=null) {
+                            // SKIP EMPTY LINES AND LINES STARTING WITH '--'
+                            if (!(read.startsWith("--") || read.equals("\n") || read.equals("\r") || read.equals(""))){
 				split=read.split(":");
 				config.put(split[0], split[1]);
+                            }
+                            
 			}
 			reader.close();
 		} catch (IOException e) {
