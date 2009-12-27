@@ -651,7 +651,7 @@ public class MoteTrackApp extends JFrame {
         this.velocityNormalizerDataReader = observer;
     }
 
-    public void setMaxVelocitySpinnerValue(int value) {
+    public void setMaxVelocitySpinnerValue(double value) {
         maxVelocitySpinner.setValue(value);
     }
 

@@ -634,7 +634,7 @@ public class DataVisualisation implements GLEventListener {
 
 
     private void drawTagHistory(SensorData data, GL gl) {
-        switch ((int)(Long.parseLong(data.getId()) % 5)) {
+        switch ((int)(Long.parseLong(data.getId()) % 8)) {
             case 0:
                 gl.glColor3d(1, 1, 0);
                 break;
@@ -650,24 +650,46 @@ public class DataVisualisation implements GLEventListener {
             case 4:
                 gl.glColor3d(1, 0, 1);
                 break;
+            case 5:
+                gl.glColor3d(0.2, 0.7, 1);
+                break;
+            case 6:
+                gl.glColor3d(0.4, 1, 0.4);
+                break;
+            case 7:
+                gl.glColor3d(0.4, 0.8, 1);
+                break;
         }
 
-
-        ArrayList<SensorData> history = data.getHistory();
-        if (history == null) {
-            return;
-        }
-        
         gl.glBegin(GL.GL_LINE_STRIP);
 
-
-        int historySize = history.size();
-        for (int i = 0, j = historySize-1; j >= 0 && i < maxHistoryReadings; i++, j--) {
-            Position actPos = history.get(j).getPos();
-            if (actPos != null) {
-                gl.glVertex3d(actPos.getX(), actPos.getY(), actPos.getZ());
-            }
+        int i = 0;
+        SensorData act = data;
+        Position actPos = act.getPos();
+        gl.glVertex3d(actPos.getX(), actPos.getY(), actPos.getZ());
+        while (i < maxHistoryReadings && act.hasPreviousData()) {
+            act = act.getPreviousData();
+            actPos = act.getPos();
+            gl.glVertex3d(actPos.getX(), actPos.getY(), actPos.getZ());
+            i++;
         }
+
+
+//        ArrayList<SensorData> history = data.getHistory();
+//        if (history == null) {
+//            return;
+//        }
+//
+//        gl.glBegin(GL.GL_LINE_STRIP);
+//
+//
+//        int historySize = history.size();
+//        for (int i = 0, j = historySize-1; j >= 0 && i < maxHistoryReadings; i++, j--) {
+//            Position actPos = history.get(j).getPos();
+//            if (actPos != null) {
+//                gl.glVertex3d(actPos.getX(), actPos.getY(), actPos.getZ());
+//            }
+//        }
 //            for (SensorData actData : data.getHistory()) {
 //                Position actPos = actData.getPos();
 //                if (actPos != null) {
