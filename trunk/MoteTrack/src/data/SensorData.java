@@ -10,161 +10,213 @@ import java.util.Observable;
 import java.util.Set;
 
 public class SensorData extends Observable {
-	private String id;
-	private long timestamp;
-	private Position pos;
-        private PositionEnum posEnum;
-        public boolean toFast = false;
 
-        private static HashMap<String, PositionEnum> idToEnum = new HashMap<String, PositionEnum>();
-        private static HashMap<PositionEnum, String> enumToId = new HashMap<PositionEnum, String>();
-        private static HashMap<String, SensorData> actData = new HashMap<String, SensorData>(),
-                                                    prevData = new HashMap<String, SensorData>();
+    // FLAGS
+    public boolean toFast = false;
+    public boolean corrected = false;
 
-        private static DummyObservable dummyObs = new DummyObservable();
 
-	private ArrayList<SensorData> history;
-        private static HashMap<String, ArrayList<String>> connectedTags = new HashMap<String, ArrayList<String>>();
+    private String id;
+    private long timestamp;
+    private Position pos;
+    private PositionEnum posEnum;
+    private double velocity;
+    private SensorData previousData;
+    private SensorData followingData;
+    private Vector3d direction;
 
-        public static Set<String> getActualTagIds() {
-            return actData.keySet();
-        }
+    private static HashMap<String, PositionEnum> idToEnum = new HashMap<String, PositionEnum>();
+    private static HashMap<PositionEnum, String> enumToId = new HashMap<PositionEnum, String>();
+    private static HashMap<String, SensorData> actData = new HashMap<String, SensorData>(),
+                                                prevData = new HashMap<String, SensorData>();
 
-        public static SensorData getDataForPosEnum(PositionEnum posEnum) {
-            return actData.get(enumToId.get(posEnum));
-        }
+    private static DummyObservable dummyObs = new DummyObservable();
 
-        public SensorData getSensorData(PositionEnum posEnum) {
-            try {
-                return actData.get(enumToId.get(posEnum));
-            } catch (NullPointerException e) {
-                return null;
-            }
-        }
+    private ArrayList<SensorData> history;
+    private static HashMap<String, ArrayList<String>> connectedTags = new HashMap<String, ArrayList<String>>();
 
-	public SensorData(String id, long timestamp, double x, double y, double z) {
-		this.id = id;
-		this.timestamp = timestamp;
-		pos = new Position(x, y, z);
-                posEnum = idToEnum.get(id);
-                dataActualice(id);
-	}
-
-        public static DummyObservable getDummyObs() {
-            return dummyObs;
-        }
-
-        public static void setPosEnum(PositionEnum posEnum, String id) {
-            idToEnum.put(id, posEnum);
-            enumToId.put(posEnum, id);
-        }
-
-        public static void setPosEnum(HashMap<String, PositionEnum> idsToEnum) {
-            Set<String> keys = idsToEnum.keySet();
-            for (String key : keys) {
-                setPosEnum(idsToEnum.get(key), key);
-            }
-
-            // Adding connections between tags based on Position Enums
-            HashMap<String, ArrayList<String>> connections = new HashMap<String, ArrayList<String>>();
-            ArrayList<String> list = new ArrayList<String>();
-            list.add(enumToId.get(PositionEnum.leftWrist));
-            list.add(enumToId.get(PositionEnum.leftHip));
-            list.add(enumToId.get(PositionEnum.rightShoulder));
-            connections.put(enumToId.get(PositionEnum.leftShoulder), list);
-            list = new ArrayList<String>();
-            list.add(enumToId.get(PositionEnum.leftAnkle));
-            list.add(enumToId.get(PositionEnum.rightHip));
-            connections.put(enumToId.get(PositionEnum.leftHip), list);
-            list = new ArrayList<String>();
-            list.add(enumToId.get(PositionEnum.rightAnkle));
-            list.add(enumToId.get(PositionEnum.rightShoulder));
-            connections.put(enumToId.get(PositionEnum.rightHip), list);
-            list = new ArrayList<String>();
-            list.add(enumToId.get(PositionEnum.rightWrist));
-            connections.put(enumToId.get(PositionEnum.rightShoulder), list);
-
-            setConnectedTags(connections);
-        }
-
-        public static void setConnectedTags(HashMap<String, ArrayList<String>> connectedTags2) {
-            connectedTags = connectedTags2;
-        }
-
-        public static PositionEnum getPosEnum(String id) throws IllegalTagIdFormatException {
-            id = SensorData.formatId(id, true);
-            return idToEnum.get(id);
-        }
-
-        public PositionEnum getPosEnum() {
-            return posEnum;
-        }
-
-        public SensorData(String sensorData) {
-            String[] splitData = sensorData.split(" ");
-            id = splitData[0];
-            timestamp = Long.parseLong(splitData[1]);
-            pos = new Position(Double.parseDouble(splitData[2]), Double.parseDouble(splitData[3]), Double.parseDouble(splitData[4]));
+    public SensorData(String id, long timestamp, double x, double y, double z) {
+            this.id = id;
+            this.timestamp = timestamp;
+            pos = new Position(x, y, z);
             posEnum = idToEnum.get(id);
+            previousData = actData.get(id);
+            if (hasPreviousData()) previousData.followingData = this;
+            calcDirectionAndVelocity();
             dataActualice(id);
-        }
+    }
 
-        private void dataActualice(String id) {
-            prevData.put(id, actData.put(id, this));
-            //@Testausgabe
-            //System.out.println(SensorData.getPattern());
-            dummyObs.setObjectChanged(SensorData.getPattern());
-        }
+    private void calcDirectionAndVelocity() {
+        direction = calcDirection();
+        velocity = calcVelocity();
+    }
 
-        public ArrayList<SensorData> getHistory() {
-            if (history == null) return null;
-            return new ArrayList<SensorData>(history);
-        }
-        public Position getLastPosition() throws NoPrevDataException {
-        	if (!prevData.containsKey(id)) {
-                throw new NoPrevDataException();
+    public void getRidOfData() {
+        if (hasFollowingData()) {
+            if (hasPreviousData()) {
+                followingData.previousData = previousData;
+                previousData.followingData = followingData;
+            } else {
+                followingData.previousData = null;
             }
-        	SensorData data = prevData.get(id);
-        	if (data==null) return null;
-        	return data.getPos();
+            prevData.put(id, actData.get(id).previousData);
+        } else {
+            previousData.followingData = null;
+            actData.put(id, previousData);
+            prevData.put(id, previousData.previousData);
+        }
+    }
+
+    private void dataActualice(String id) {
+        prevData.put(id, actData.put(id, this));
+        //@Testausgabe
+        //System.out.println(SensorData.getPattern());
+        dummyObs.setObjectChanged(SensorData.getPattern());
+    }
+
+    public static Set<String> getActualTagIds() {
+        return actData.keySet();
+    }
+
+    public static SensorData getDataForPosEnum(PositionEnum posEnum) {
+        return actData.get(enumToId.get(posEnum));
+    }
+
+    public SensorData getPreviousData() {
+        return previousData;
+    }
+
+    public SensorData getFollowingData() {
+        return followingData;
+    }
+
+    public boolean hasPreviousData() {
+        return previousData != null;
+    }
+
+    public boolean hasFollowingData() {
+        return followingData != null;
+    }
+
+    public SensorData getSensorData(PositionEnum posEnum) {
+        try {
+            return actData.get(enumToId.get(posEnum));
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+
+    public static DummyObservable getDummyObs() {
+        return dummyObs;
+    }
+
+    public static void setPosEnum(PositionEnum posEnum, String id) {
+        idToEnum.put(id, posEnum);
+        enumToId.put(posEnum, id);
+    }
+
+    public static void setPosEnum(HashMap<String, PositionEnum> idsToEnum) {
+        Set<String> keys = idsToEnum.keySet();
+        for (String key : keys) {
+            setPosEnum(idsToEnum.get(key), key);
         }
 
-        @Override
-	public String toString() {
-		return id+" "+timestamp+" "+pos;
-	}
+        // Adding connections between tags based on Position Enums
+        HashMap<String, ArrayList<String>> connections = new HashMap<String, ArrayList<String>>();
+        ArrayList<String> list = new ArrayList<String>();
+        list.add(enumToId.get(PositionEnum.leftWrist));
+        list.add(enumToId.get(PositionEnum.leftHip));
+        list.add(enumToId.get(PositionEnum.rightShoulder));
+        connections.put(enumToId.get(PositionEnum.leftShoulder), list);
+        list = new ArrayList<String>();
+        list.add(enumToId.get(PositionEnum.leftAnkle));
+        list.add(enumToId.get(PositionEnum.rightHip));
+        connections.put(enumToId.get(PositionEnum.leftHip), list);
+        list = new ArrayList<String>();
+        list.add(enumToId.get(PositionEnum.rightAnkle));
+        list.add(enumToId.get(PositionEnum.rightShoulder));
+        connections.put(enumToId.get(PositionEnum.rightHip), list);
+        list = new ArrayList<String>();
+        list.add(enumToId.get(PositionEnum.rightWrist));
+        connections.put(enumToId.get(PositionEnum.rightShoulder), list);
 
-        public static HashMap<String, SensorData> getData() {
-            return new HashMap<String, SensorData>(actData);
+        setConnectedTags(connections);
+    }
+
+    public static void setConnectedTags(HashMap<String, ArrayList<String>> connectedTags2) {
+        connectedTags = connectedTags2;
+    }
+
+    public static PositionEnum getPosEnum(String id) throws IllegalTagIdFormatException {
+        id = SensorData.formatId(id, true);
+        return idToEnum.get(id);
+    }
+
+    public PositionEnum getPosEnum() {
+        return posEnum;
+    }
+
+    public SensorData(String sensorData) {
+        String[] splitData = sensorData.split(" ");
+        id = splitData[0];
+        timestamp = Long.parseLong(splitData[1]);
+        pos = new Position(Double.parseDouble(splitData[2]), Double.parseDouble(splitData[3]), Double.parseDouble(splitData[4]));
+        posEnum = idToEnum.get(id);
+        dataActualice(id);
+    }
+
+    public ArrayList<SensorData> getHistory() {
+        if (history == null) return null;
+        return new ArrayList<SensorData>(history);
+    }
+    public Position getLastPosition() throws NoPrevDataException {
+        if (!prevData.containsKey(id)) {
+            throw new NoPrevDataException();
         }
 
-	public String getId() {
-		return id;
-	}
-
-	public long getTimestamp() {
-		return timestamp;
-	}
-
-	public double getX() {
-		return pos.getX();
-	}
-
-	public double getY() {
-		return pos.getY();
-	}
-
-	public double getZ() {
-		return pos.getZ();
-	}
-
-        public Position getPos() {
-            return pos;
+        if (hasPreviousData()) {
+            return previousData.getPos();
         }
-        
-        public void setPos(Position pos) {
-        	this.pos = pos;
-        }
+
+        return null;
+    }
+
+    @Override
+    public String toString() {
+            return id+" "+timestamp+" "+pos;
+    }
+
+    public static HashMap<String, SensorData> getData() {
+        return new HashMap<String, SensorData>(actData);
+    }
+
+    public String getId() {
+            return id;
+    }
+
+    public long getTimestamp() {
+            return timestamp;
+    }
+
+    public double getX() {
+            return pos.getX();
+    }
+
+    public double getY() {
+            return pos.getY();
+    }
+
+    public double getZ() {
+            return pos.getZ();
+    }
+
+    public Position getPos() {
+        return pos;
+    }
+
+    public void setPos(Position pos) {
+            this.pos = pos;
+    }
 
     /**
      *
@@ -172,22 +224,28 @@ public class SensorData extends Observable {
      * @param previous
      * @return returns the actual velocity
      */
-    public double getVelocity() throws NoPrevDataException {
-        if (!prevData.containsKey(id)) {
-            throw new NoPrevDataException();
-        }
-        if (prevData.get(id)==null) throw new NoPrevDataException();
+    public double getVelocity(){
+        return velocity;
+    }
 
-        long deltaT = (timestamp - prevData.get(id).timestamp); // milliseconds
+    private double calcVelocity() {
+        if (previousData==null) return 0;
+
+        long deltaT = (timestamp - previousData.timestamp); // milliseconds
         double dist = getDirection().getLength();   // meter
         return dist / deltaT * 1000; // m/s
     }
 
-    public Vector3d getDirection() throws NoPrevDataException {
-        if (!prevData.containsKey(id)) {
-            throw new NoPrevDataException();
+    public Vector3d calcDirection() {
+        if (hasPreviousData()) {
+            return new Vector3d(previousData.pos, pos);
         }
-        return new Vector3d(prevData.get(id).pos, pos);
+        
+        return new Vector3d(0, 0, 0);
+    }
+
+    public Vector3d getDirection() {
+        return direction;
     }
     
     public double getAngle(Position pos) {

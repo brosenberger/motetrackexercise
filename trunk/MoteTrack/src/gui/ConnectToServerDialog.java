@@ -70,8 +70,8 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
             }
      };
 
-     public int getMaxVelocity() {
-         return Integer.parseInt(maxVelocitySpinner.getValue().toString());
+     public double getMaxVelocity() {
+         return Double.parseDouble(maxVelocitySpinner.getValue().toString());
      }
 
     /** This method is called from within the constructor to
@@ -320,7 +320,7 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
             }
 
             if (maxVelocityCheckBox.isSelected()) {
-                obs = new VelocityNormalizerDataReader(Integer.valueOf(maxVelocitySpinner.getValue().toString()));
+                obs = new VelocityNormalizerDataReader(Double.valueOf(maxVelocitySpinner.getValue().toString()));
                 newClient.addObserver(obs);
             }
 

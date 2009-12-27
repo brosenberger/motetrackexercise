@@ -41,19 +41,23 @@ public class Position {
     }
 
     public void setX(double x) {
-		this.x = x;
-	}
+        this.x = x;
+    }
 
-	public void setY(double y) {
-		this.y = y;
-	}
+    public void setY(double y) {
+        this.y = y;
+    }
 
-	public void setZ(double z) {
-		this.z = z;
-	}
+    public void setZ(double z) {
+        this.z = z;
+    }
     public void addPercentage(double perc) {
     	this.x *= (1+perc);
     	this.y *= (1+perc);
     	this.z *= (1+perc);
+    }
+
+    public Position addVector(Vector3d v) {
+        return new Position(x+v.getX(), y+v.getY(), z+v.getZ());
     }
 }
