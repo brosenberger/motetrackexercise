@@ -694,9 +694,13 @@ public class DataVisualisation implements GLEventListener {
         } else if (selectedTag2Ids.contains(id)) {
             setDrawingColor(gl, Color.YELLOW);
         } else if (selectedTagIds.contains(id)) {
-            setDrawingColor(gl, Color.RED);
+            setDrawingColor(gl, Color.GREEN);
         } else {
             setDrawingColor(gl, Color.WHITE);
+        }
+
+        if (data.toFast) {
+            setDrawingColor(gl, Color.RED);
         }
 
         // draw 2d beacon

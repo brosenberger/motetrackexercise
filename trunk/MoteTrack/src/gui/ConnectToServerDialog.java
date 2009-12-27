@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import listener.ConnectionListener;
@@ -44,12 +45,14 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
     private ServerDataReader client;
     private ConnectToServerDialog ctsd;
     private VelocityNormalizerDataReader obs;
+    private SpinnerNumberModel maxVelocitySpinnerModel;
 
     /** Creates new form ConnectToServerDialog */
     public ConnectToServerDialog(MoteTrackApp parent, boolean modal) {
         super(parent, modal);
         normalizationPos = new Position(0, 0, 0);
         simpleListModel = new SimpleListModel();
+        maxVelocitySpinnerModel = new SpinnerNumberModel(3.0, 0.0, 100.0, 0.1);
         this.parent = parent;
         initComponents();
 
@@ -182,10 +185,11 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
             }
         });
 
+        maxVelocitySpinner.setModel(maxVelocitySpinnerModel);
         maxVelocitySpinner.setEnabled(false);
         maxVelocitySpinner.setValue(100);
 
-        maxVelocityLabel.setText("m/s / 1000");
+        maxVelocityLabel.setText("m/s");
         maxVelocityLabel.setEnabled(false);
 
         serverComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "localhost:5000", "192.168.93.10:6666" }));
@@ -220,8 +224,8 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(maxVelocityCheckBox)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(maxVelocitySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(maxVelocitySpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(maxVelocityLabel)
                         .addGap(14, 14, 14))
