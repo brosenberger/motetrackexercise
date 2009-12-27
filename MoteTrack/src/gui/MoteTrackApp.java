@@ -102,7 +102,7 @@ public class MoteTrackApp extends JFrame {
     /** Creates new form MainFrame */
     public MoteTrackApp() {
         historySpinnerModel = new SpinnerNumberModel(5, 0, 2000, 1);
-        maxVelocitySpinnerModel = new SpinnerNumberModel(0.005, 0, 1, 0.001);
+        maxVelocitySpinnerModel = new SpinnerNumberModel(3.0, 0.0, 100.0, 0.1);
         tagSizeSpinnerModel = new SpinnerNumberModel(2, 0, 10, 1);
 
         patternPool = new PatternPool();

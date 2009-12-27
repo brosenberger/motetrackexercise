@@ -24,9 +24,11 @@ public class VelocityNormalizerDataReader extends Observable implements
 		if (!(arg1 instanceof SensorData)) return;
 		SensorData data = (SensorData) arg1;
 		try {
+                        System.out.println("Velocity of "+data.getId()+": "+data.getVelocity());
 			if (data.getVelocity()>this.maxSpeed) {
-				data.setPos(data.getLastPosition());
-			} else if (data.getVelocity()<Math.pow(10, -7));
+//				data.setPos(data.getLastPosition());
+                            data.toFast = true;
+			}
 		} catch (NoPrevDataException e) {}
 		this.setChanged();
 		this.notifyObservers(data);

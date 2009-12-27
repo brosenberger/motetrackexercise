@@ -58,7 +58,7 @@ public class TagIdListModel implements ListModel {
                 String entry = (enumVal.equals("null")?id:id+"@"+enumVal);
                 tagIds.add(entry);
             }
-            fireListDataListeners(getSize());
+            if (getSize()>0) fireListDataListeners(getSize()-1);
         } catch (IllegalTagIdFormatException ex) {
             tagIds = new ArrayList<String>();
             String msg = "Tag Id Format Exception occured while setting HistoryCollector - ID: "+ex.getIllegalTagId();

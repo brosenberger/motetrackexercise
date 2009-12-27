@@ -14,6 +14,7 @@ public class SensorData extends Observable {
 	private long timestamp;
 	private Position pos;
         private PositionEnum posEnum;
+        public boolean toFast = false;
 
         private static HashMap<String, PositionEnum> idToEnum = new HashMap<String, PositionEnum>();
         private static HashMap<PositionEnum, String> enumToId = new HashMap<PositionEnum, String>();
@@ -24,6 +25,14 @@ public class SensorData extends Observable {
 
 	private ArrayList<SensorData> history;
         private static HashMap<String, ArrayList<String>> connectedTags = new HashMap<String, ArrayList<String>>();
+
+        public static Set<String> getActualTagIds() {
+            return actData.keySet();
+        }
+
+        public static SensorData getDataForPosEnum(PositionEnum posEnum) {
+            return actData.get(enumToId.get(posEnum));
+        }
 
         public SensorData getSensorData(PositionEnum posEnum) {
             try {
@@ -171,7 +180,7 @@ public class SensorData extends Observable {
 
         long deltaT = (timestamp - prevData.get(id).timestamp); // milliseconds
         double dist = getDirection().getLength();   // meter
-        return dist / deltaT / 1000; // m/s
+        return dist / deltaT * 1000; // m/s
     }
 
     public Vector3d getDirection() throws NoPrevDataException {
@@ -218,7 +227,7 @@ public class SensorData extends Observable {
                 sb.deleteCharAt(3);
                 break;
             default:
-                // Should never be reached as isValidTagId checks that
+                // Should never be reached as isValidTagId() checks that
                 throw new RuntimeException("ILLEGAL TAG ID LENGTH (SHOULD NEVER BE REACHED) - ID: "+id);
         }
 
@@ -340,5 +349,13 @@ public class SensorData extends Observable {
         }
 
         return true;
+    }
+    
+    public double distanceTo(SensorData data) {
+        return (new Vector3d(pos, data.pos)).getLength();
+    }
+
+    public static double distanceBetween(SensorData data1, SensorData data2) {
+        return (new Vector3d(data1.pos, data2.pos)).getLength();
     }
 }
