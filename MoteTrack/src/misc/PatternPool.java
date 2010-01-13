@@ -101,6 +101,7 @@ public class PatternPool extends Observable implements Observer {
 		check.setObservePattern(arr = list.toArray(arr));
 		check.startObservation();
 		this.patternChecker.add(check);
+                check.addObserver(this);
 		list.clear();
 	}
 
@@ -117,6 +118,7 @@ public class PatternPool extends Observable implements Observer {
 		//	System.out.print("pattern to check, now distributing");
 			this.distributePattern((AnglePattern) arg1);
 		} else if (arg0 instanceof PatternChecker) {
+//                    System.out.println("PATTERN POOL: updated from PatternChecker -> pattern checked: "+(String)arg1);
 			this.setChanged();
 			this.notifyObservers(arg1);
 		}

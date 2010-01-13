@@ -12,6 +12,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.JSpinner;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -37,6 +38,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
@@ -47,6 +49,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -54,6 +57,7 @@ import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
+import misc.HigherPatternMatcher;
 import misc.MoteTrackConfiguration;
 import models.TagIdListModel;
 import network.ServerDataReader;
@@ -88,7 +92,9 @@ public class MoteTrackApp extends JFrame {
     private LoggerFrame loggerFrame;
     private PatternRecorder patternRecorder;
     private PatternPool patternPool;
+    private HigherPatternMatcher higherPatternMatcher;
     private SelectEnumDialog selectEnumDialog;
+    private ImageIcon nothing, up, down;
 
     private SpinnerNumberModel historySpinnerModel, maxVelocitySpinnerModel, tagSizeSpinnerModel;
 
@@ -100,6 +106,15 @@ public class MoteTrackApp extends JFrame {
         this.velocityNormalizerDataReader = observer;
     }
 
+//    private ImageIcon createImageIcon(String path, String description) {
+//        java.net.URL imgURL = (new JPanel()).getClass().getResource(path);
+//        if (imgURL != null) {
+//            return new ImageIcon(imgURL, description);
+//        } else {
+//
+//        }
+//    }
+
     /** Creates new form MainFrame */
     public MoteTrackApp() {
         historySpinnerModel = new SpinnerNumberModel(5, 0, 2000, 1);
@@ -107,12 +122,20 @@ public class MoteTrackApp extends JFrame {
         tagSizeSpinnerModel = new SpinnerNumberModel(2, 0, 10, 1);
 
         patternPool = new PatternPool();
+        higherPatternMatcher = new HigherPatternMatcher(this);
+        patternPool.addObserver(higherPatternMatcher);
         tagIdListModel = new TagIdListModel();
         patternRecorder = new PatternRecorder();
         SensorData.getDummyObs().addObserver(patternRecorder);
         SensorData.getDummyObs().addObserver(patternPool);
         
         initComponents();
+
+        nothing = new ImageIcon("../nothing.gif", "nothing");
+        up = new ImageIcon("../up_arrow.gif", "up");
+        down = new ImageIcon("../down_arrow.gif", "down");
+
+        jLabel2.setIcon(nothing);
 
         startServerDialog = new StartReplayServerDialog(this, true);
         connectToServerDialog = new ConnectToServerDialog(this, true);
@@ -167,6 +190,18 @@ public class MoteTrackApp extends JFrame {
             animator.start();
     }
 
+    public void setPictureUP() {
+        jLabel2.setIcon(up);
+    }
+
+    public void setPictureDOWN() {
+        jLabel2.setIcon(down);
+    }
+
+    public void setCounter(int count) {
+        jLabel3.setText(""+count);
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -194,6 +229,8 @@ public class MoteTrackApp extends JFrame {
         startRecordButton = new JButton();
         stopRecordButton = new JButton();
         calibrationSpinner = new JSpinner();
+        jLabel2 = new JLabel();
+        jLabel3 = new JLabel();
         jMenuBar1 = new JMenuBar();
         fileMenu = new JMenu();
         startReplayServerItem = new JMenuItem();
@@ -296,6 +333,9 @@ public class MoteTrackApp extends JFrame {
 
         calibrationSpinner.setValue(5);
 
+        jLabel3.setText("0");
+        jLabel3.setHorizontalTextPosition(SwingConstants.CENTER);
+
         fileMenu.setText("File");
 
         startReplayServerItem.setText("Start Replay Server");
@@ -376,46 +416,45 @@ public class MoteTrackApp extends JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(tagIdListLabel)
-                    .addComponent(tagIdListScrollPane, GroupLayout.PREFERRED_SIZE, 162, GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addComponent(canvas, GroupLayout.PREFERRED_SIZE, 551, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(Alignment.LEADING)
-                    .addComponent(planeCheckBox)
-                    .addComponent(beacon2dCheckBox)
-                    .addComponent(historyCheckBox)
-                    .addComponent(resetButton)
-                    .addComponent(drawAxesCheckBox)
-                    .addComponent(detailedRoomPlanCheckBox)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(tagSizeSpinner, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                            .addComponent(tagIdListLabel)
+                            .addComponent(tagIdListScrollPane, GroupLayout.PREFERRED_SIZE, 162, GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(ComponentPlacement.RELATED)
-                        .addComponent(tagSizeLabel)
-                        .addGap(19, 19, 19))
-                    .addComponent(jLabel1)
+                        .addComponent(canvas, GroupLayout.PREFERRED_SIZE, 551, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                            .addComponent(drawAxesCheckBox)
+                            .addComponent(detailedRoomPlanCheckBox)
+                            .addComponent(jLabel1)
+                            .addComponent(startRecordButton)
+                            .addComponent(stopRecordButton)
+                            .addComponent(calibrationSpinner, GroupLayout.PREFERRED_SIZE, 67, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(maxHistoryReadingsSpinner, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(beacon2dCheckBox)
+                            .addComponent(historyCheckBox)
+                            .addComponent(resetButton)
+                            .addComponent(planeCheckBox)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(tagSizeSpinner, GroupLayout.PREFERRED_SIZE, 40, GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(ComponentPlacement.RELATED)
+                                .addComponent(tagSizeLabel))
+                            .addComponent(maxVelocityLabel)
+                            .addComponent(maxVelocitySpinner, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(maxHistoryReadingsSpinner, GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
-                        .addGap(110, 110, 110))
-                    .addComponent(startRecordButton)
-                    .addComponent(stopRecordButton)
-                    .addComponent(calibrationSpinner, GroupLayout.PREFERRED_SIZE, 67, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(maxVelocityLabel)
-                    .addComponent(maxVelocitySpinner, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE))
+                        .addGap(283, 283, 283)
+                        .addComponent(jLabel2, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel3, GroupLayout.DEFAULT_SIZE, 512, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(Alignment.LEADING)
-            .addGroup(Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(Alignment.TRAILING)
-                    .addComponent(canvas, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 446, Short.MAX_VALUE)
-                    .addGroup(Alignment.LEADING, layout.createSequentialGroup()
-                        .addComponent(tagIdListLabel)
-                        .addPreferredGap(ComponentPlacement.RELATED)
-                        .addComponent(tagIdListScrollPane, GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE))
                     .addGroup(Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(resetButton)
                         .addGap(11, 11, 11)
@@ -438,14 +477,27 @@ public class MoteTrackApp extends JFrame {
                         .addComponent(stopRecordButton)
                         .addPreferredGap(ComponentPlacement.UNRELATED)
                         .addComponent(calibrationSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(ComponentPlacement.RELATED, 72, Short.MAX_VALUE)
+                        .addPreferredGap(ComponentPlacement.RELATED, 89, Short.MAX_VALUE)
                         .addComponent(maxVelocityLabel)
                         .addPreferredGap(ComponentPlacement.RELATED)
                         .addComponent(maxVelocitySpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                             .addComponent(tagSizeSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(tagSizeLabel))))
+                            .addComponent(tagSizeLabel)))
+                    .addGroup(Alignment.LEADING, layout.createParallelGroup(Alignment.TRAILING, false)
+                        .addGroup(Alignment.LEADING, layout.createSequentialGroup()
+                            .addComponent(tagIdListLabel)
+                            .addPreferredGap(ComponentPlacement.RELATED)
+                            .addComponent(tagIdListScrollPane))
+                        .addComponent(canvas, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 459, GroupLayout.PREFERRED_SIZE)))
+                .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(ComponentPlacement.RELATED)
+                        .addComponent(jLabel2, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(32, 32, 32)
+                        .addComponent(jLabel3, GroupLayout.PREFERRED_SIZE, 15, GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -705,6 +757,8 @@ public class MoteTrackApp extends JFrame {
     private JMenu fileMenu;
     private JCheckBox historyCheckBox;
     private JLabel jLabel1;
+    private JLabel jLabel2;
+    private JLabel jLabel3;
     private JMenuBar jMenuBar1;
     private JMenuItem loadConfigMenuItem;
     private JMenuItem loadPatternMenuItem;

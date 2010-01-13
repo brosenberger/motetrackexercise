@@ -23,6 +23,14 @@ public class PatternChecker extends Observable implements Runnable {
 	public void checkPattern(AnglePattern pat) {
 		this.actPattern.addLast(pat);
 	//	System.out.println("add pattern to compare");
+                for (int i=0;i<observePattern.length;i++) {
+                        if (pat.match(observePattern[i])) {
+                                this.setChanged();
+                                this.notifyObservers(this.patternName);
+//                                System.out.println("pattern matched "+this.patternName);
+                                break;
+                        }
+                }
 	}
 
 	public void setObservePattern(Object[] array) {
@@ -41,22 +49,22 @@ public class PatternChecker extends Observable implements Runnable {
 
 	@Override
 	public void run() {
-		AnglePattern toCheck;
-		System.out.println("start checking "+this.patternName);
-		while (run) {
-			if (actPattern.size()>0) {
-				try {
-                                    toCheck = actPattern.removeFirst();
-                                    for (int i=0;i<observePattern.length;i++) {
-                                            if (toCheck.match(observePattern[i])) {
-                                                    this.setChanged();
-                                                    this.notifyObservers(this.patternName);
-                                                    System.out.println("pattern matched "+this.patternName);
-                                                    break;
-                                            }
-                                    }
-                                } catch (NoSuchElementException e) {}
-			}
-		}
+//		AnglePattern toCheck;
+//		System.out.println("start checking "+this.patternName);
+//		while (run) {
+//			if (actPattern.size()>0) {
+//				try {
+//                                    toCheck = actPattern.removeFirst();
+//                                    for (int i=0;i<observePattern.length;i++) {
+//                                            if (toCheck.match(observePattern[i])) {
+//                                                    this.setChanged();
+//                                                    this.notifyObservers(this.patternName);
+////                                                    System.out.println("pattern matched "+this.patternName);
+//                                                    break;
+//                                            }
+//                                    }
+//                                } catch (NoSuchElementException e) {}
+//			}
+//		}
 	}
 }
