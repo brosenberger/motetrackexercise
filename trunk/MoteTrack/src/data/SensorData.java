@@ -364,7 +364,7 @@ public class SensorData extends Observable {
     		s = SensorData.getDataForPosEnum(patternList.get(i));
     		v1 = new Vector3d(anglePoint.getPos(),f.getPos());
     		v2 = new Vector3d(anglePoint.getPos(),s.getPos());
-    		pattern.setPatternAt((i-2)%3, Vector3d.getAngleBetween(v1, v2));
+    		pattern.setPatternAt((i-2)%3,Math.toDegrees(Vector3d.getAngleBetween(v1, v2)));
     	}
     	return pattern;
     }
