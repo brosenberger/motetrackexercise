@@ -23,7 +23,19 @@ public class Pattern {
 			list=generatePattern(PositionEnum.leftWrist,PositionEnum.leftShoulder,PositionEnum.rightShoulder, 90);
 		} else if (name.equalsIgnoreCase("rechterArm90")) {
 			list=generatePattern(PositionEnum.leftShoulder,PositionEnum.rightShoulder,PositionEnum.rightWrist, 90);
-		}
+		} else if (name.equalsIgnoreCase("linkerArmHuefte90")) {
+			list=generatePattern(PositionEnum.leftWrist,PositionEnum.leftShoulder,PositionEnum.leftHip, 90);
+		} else if (name.equalsIgnoreCase("linkerArmHuefte180")) {
+			list=generatePattern(PositionEnum.leftWrist,PositionEnum.leftShoulder,PositionEnum.leftHip, 180);
+		} else if (name.equalsIgnoreCase("rechterArmHuefte180")) {
+			list=generatePattern(PositionEnum.rightWrist,PositionEnum.rightShoulder,PositionEnum.rightHip, 180);
+		} else if (name.equalsIgnoreCase("rechterArmHuefte90")) {
+			list=generatePattern(PositionEnum.rightWrist,PositionEnum.rightShoulder,PositionEnum.rightHip, 90);
+		} else if (name.equalsIgnoreCase("linkerArmHuefte00")) {
+			list=generatePattern(PositionEnum.leftWrist,PositionEnum.leftShoulder,PositionEnum.leftHip, 0);
+		} else if (name.equalsIgnoreCase("rechterArmHuefte00")) {
+			list=generatePattern(PositionEnum.rightWrist,PositionEnum.rightShoulder,PositionEnum.rightHip, 0);
+		} 
 		return list;
 	}
 	public static String[] getStandardPatternNames() {
