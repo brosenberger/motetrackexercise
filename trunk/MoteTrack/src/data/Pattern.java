@@ -50,7 +50,11 @@ public class Pattern {
                                                             "linkerArmHuefte00",
                                                             "rechterArmHuefte00"};
 
-	public static String[] getStandardPatternNames() {
+	public static final String LEFT_ARM_SHOULDER_STRAIGHT = "linkerArmAusgestreckt",
+                                    RIGHT_ARM_SHOULDER_STRAIGHT = "rechterArmAusgestreckt",
+                                    LEFT_ARM_SHOULDER_90 = "linkerArm90";
+
+        public static String[] getStandardPatternNames() {
 		return standardPatternNames;
 	}
 }
