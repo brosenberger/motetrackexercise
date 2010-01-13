@@ -2,6 +2,7 @@ package data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class AnglePattern implements Serializable {
 	private ArrayList<PositionEnum> patternList;
@@ -30,8 +31,19 @@ public class AnglePattern implements Serializable {
 		return (Math.abs(x-y)<range);
 	}
 	
+	private boolean matchPattern(ArrayList<PositionEnum> a1,ArrayList<PositionEnum> a2) {
+		if (a1.size()!=a2.size()) return false;
+		Iterator<PositionEnum> i1, i2;
+		i1 = a1.iterator();
+		i2 = a2.iterator();
+		while (i1.hasNext()) {
+			if (i1.next()!=i2.next()) return false;
+		}
+		return true;
+	}
+	
 	public boolean match(AnglePattern p) {
-		if (!p.getPatternList().equals(this.patternList)) return false;
+		if (matchPattern(p.getPatternList(),this.patternList)) return false;
 		double[] pattern2 = p.getPattern();
 		//if (pattern2.length!=pattern.length) return false;
 		for (int i=0;i<pattern.length;i++) {
