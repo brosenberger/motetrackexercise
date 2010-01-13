@@ -33,8 +33,11 @@ public class PatternPool extends Observable implements Observer {
 	}
 	*/
 	public void loadPattern() {
-		storeAndActivatePattern("linkerArmAusgestreckt",Pattern.getPattern("linkerArmAusgestreckt"));
-		storeAndActivatePattern("rechterArmAusgestreckt",Pattern.getPattern("rechterArmAusgestreckt"));
+		for (String pName : Pattern.getStandardPatternNames()) {
+			storeAndActivatePattern(pName, Pattern.getPattern(pName));
+        }
+		//storeAndActivatePattern("linkerArmAusgestreckt",Pattern.getPattern("linkerArmAusgestreckt"));
+		//storeAndActivatePattern("rechterArmAusgestreckt",Pattern.getPattern("rechterArmAusgestreckt"));
 		//loadPattern(PositionEnum.leftWrist,PositionEnum.leftShoulder,PositionEnum.rightShoulder, 180,"linkerArmAusgestreckt");
 	}
 	
