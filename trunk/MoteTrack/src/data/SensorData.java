@@ -76,9 +76,11 @@ public class SensorData extends Observable {
         prevData.put(id, actData.put(id, this));
         //@Testausgabe
         //System.out.println(SensorData.getPattern());
-        if (patternList != null) {
-            dummyObs.setObjectChanged(SensorData.getPattern());
+      //  if (patternList != null) {
+        for (String pName : Pattern.getStandardPatternNames()) {
+        	dummyObs.setObjectChanged(SensorData.getPattern(Pattern.getPattern(pName).getFirst().getPatternList()));
         }
+        //}
     }
 
     public static Set<String> getActualTagIds() {
@@ -356,7 +358,7 @@ public class SensorData extends Observable {
         return connected;
     }
     
-    public static AnglePattern getPattern() {
+    public static AnglePattern getPattern(ArrayList<PositionEnum> patternList) {
     	AnglePattern pattern = new AnglePattern(patternList);
     	SensorData anglePoint,f,s;
     	Vector3d v1, v2;

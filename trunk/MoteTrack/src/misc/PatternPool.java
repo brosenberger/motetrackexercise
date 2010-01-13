@@ -21,7 +21,7 @@ public class PatternPool extends Observable implements Observer {
 	public PatternPool() {
 		patternChecker = new LinkedList<PatternChecker>();
 	}
-	
+	/*
 	private void loadPattern(PositionEnum l, PositionEnum anglePoint, PositionEnum r, double angle, String name) {
 		ArrayList<PositionEnum> list= new ArrayList<PositionEnum>();
 		list.add(l); list.add(anglePoint); list.add(r);
@@ -31,9 +31,11 @@ public class PatternPool extends Observable implements Observer {
 		listAnglePattern.add(p);
 		storeAndActivatePattern(name, listAnglePattern);
 	}
-	
+	*/
 	public void loadPattern() {
-		loadPattern(PositionEnum.leftWrist,PositionEnum.leftShoulder,PositionEnum.rightShoulder, 180,"linkerArmAusgestreckt");
+		storeAndActivatePattern("linkerArmAusgestreckt",Pattern.getPattern("linkerArmAusgestreckt"));
+		storeAndActivatePattern("rechterArmAusgestreckt",Pattern.getPattern("rechterArmAusgestreckt"));
+		//loadPattern(PositionEnum.leftWrist,PositionEnum.leftShoulder,PositionEnum.rightShoulder, 180,"linkerArmAusgestreckt");
 	}
 	
 	public void loadPattern(String fileName) {
