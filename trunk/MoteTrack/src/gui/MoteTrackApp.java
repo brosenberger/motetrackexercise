@@ -88,6 +88,7 @@ public class MoteTrackApp extends JFrame {
     private LoggerFrame loggerFrame;
     private PatternRecorder patternRecorder;
     private PatternPool patternPool;
+    private SelectEnumDialog selectEnumDialog;
 
     private SpinnerNumberModel historySpinnerModel, maxVelocitySpinnerModel, tagSizeSpinnerModel;
 
@@ -116,6 +117,7 @@ public class MoteTrackApp extends JFrame {
         startServerDialog = new StartReplayServerDialog(this, true);
         connectToServerDialog = new ConnectToServerDialog(this, true);
         connectTagDialog = new ConnectTagDialog(this, false);
+        selectEnumDialog = new SelectEnumDialog(this, false);
         loggerFrame = new LoggerFrame();
         maxVelocitySpinner.setValue(connectToServerDialog.getMaxVelocity());
 
@@ -528,6 +530,10 @@ public class MoteTrackApp extends JFrame {
     }//GEN-LAST:event_showLoggerFrameMenuItemActionPerformed
 
     private void startRecordButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_startRecordButtonActionPerformed
+        selectEnumDialog.setVisible(true);
+    }//GEN-LAST:event_startRecordButtonActionPerformed
+
+    public void startPatternRecorder() {
         switch (patternRecorder.startRecording()) {
             case PatternRecorder.STARTED_RECORDING:
                 JOptionPane.showMessageDialog(this, "Recording started.", "RECORDING STARTED", JOptionPane.INFORMATION_MESSAGE);
@@ -541,10 +547,11 @@ public class MoteTrackApp extends JFrame {
             default:
                 JOptionPane.showMessageDialog(this, "Unknown return value of startRecording()", "UNKNOWN RETURN VALUE", JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_startRecordButtonActionPerformed
+    }
 
     private void stopRecordButtonActionPerformed(ActionEvent evt) {//GEN-FIRST:event_stopRecordButtonActionPerformed
         patternRecorder.stopRecording();
+        SensorData.setPatterList(null);
     }//GEN-LAST:event_stopRecordButtonActionPerformed
 
     private void loadPatternMenuItemActionPerformed(ActionEvent evt) {//GEN-FIRST:event_loadPatternMenuItemActionPerformed

@@ -24,6 +24,7 @@ public class SensorData extends Observable {
     private SensorData previousData;
     private SensorData followingData;
     private Vector3d direction;
+    private static ArrayList<PositionEnum> patternList;
 
     private static HashMap<String, PositionEnum> idToEnum = new HashMap<String, PositionEnum>();
     private static HashMap<PositionEnum, String> enumToId = new HashMap<PositionEnum, String>();
@@ -44,6 +45,10 @@ public class SensorData extends Observable {
             if (hasPreviousData()) previousData.followingData = this;
             calcDirectionAndVelocity();
             dataActualice(id);
+    }
+
+    public static void setPatterList(ArrayList<PositionEnum> list) {
+        patternList = list;
     }
 
     private void calcDirectionAndVelocity() {
