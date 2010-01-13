@@ -7,20 +7,33 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
 
-import data.AnglePattern;
-import data.DummyObservable;
-import data.SensorData;
+import data.*;
 
 public class PatternPool extends Observable implements Observer {
 	LinkedList<PatternChecker> patternChecker;
 	
 	public PatternPool() {
 		patternChecker = new LinkedList<PatternChecker>();
+	}
+	
+	private void loadPattern(PositionEnum l, PositionEnum anglePoint, PositionEnum r, double angle, String name) {
+		ArrayList<PositionEnum> list= new ArrayList<PositionEnum>();
+		list.add(l); list.add(anglePoint); list.add(r);
+		AnglePattern p = new AnglePattern(list);
+		p.setPatternAt(0, angle);
+		LinkedList<AnglePattern> listAnglePattern = new LinkedList<AnglePattern>();
+		listAnglePattern.add(p);
+		storeAndActivatePattern(name, listAnglePattern);
+	}
+	
+	public void loadPattern() {
+		loadPattern(PositionEnum.leftWrist,PositionEnum.leftShoulder,PositionEnum.rightShoulder, 180,"linkerArmAusgestreckt");
 	}
 	
 	public void loadPattern(String fileName) {
