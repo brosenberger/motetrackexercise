@@ -366,10 +366,13 @@ public class SensorData extends Observable {
     		f = SensorData.getDataForPosEnum(patternList.get(i++));
     		anglePoint = SensorData.getDataForPosEnum(patternList.get(i++));
     		s = SensorData.getDataForPosEnum(patternList.get(i));
+                if (f == null || s == null || anglePoint == null) {
+                    return pattern;
+                }
     		v1 = new Vector3d(anglePoint.getPos(),f.getPos());
     		v2 = new Vector3d(anglePoint.getPos(),s.getPos());
     		pattern.setPatternAt((i-2)%3,Math.toDegrees(Vector3d.getAngleBetween(v1, v2)));
-                System.out.println(Math.toDegrees(Vector3d.getAngleBetween(v1, v2)));
+                //System.out.println(Math.toDegrees(Vector3d.getAngleBetween(v1, v2)));
     	}
     	return pattern;
     }
