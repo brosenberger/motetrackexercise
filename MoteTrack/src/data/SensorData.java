@@ -355,24 +355,16 @@ public class SensorData extends Observable {
     }
     
     public static AnglePattern getPattern() {
-    	AnglePattern pattern = new AnglePattern(7);
-    	HashMap<String, ArrayList<String>> connections = SensorData.getConnectedTags();
-    	HashMap<String, SensorData> data = SensorData.getData();
-    	SensorData from, to;
-    	int i=0;
-    	String fromStr;
-    	Iterator<String> itKeys =connections.keySet().iterator();
-    	Iterator<String> itConn;
-    	while (itKeys.hasNext()) {
-    		fromStr = itKeys.next();
-    		from = data.get(fromStr);
-    		if (from == null) continue;
-    		itConn = connections.get(fromStr).iterator();
-    		while (itConn.hasNext()) {
-    			to = data.get(itConn.next());
-    			if (to==null) continue;
-    			pattern.setPatternAt(i++, Math.toDegrees(from.getAngle(to.getPos())));
-    		}
+    	AnglePattern pattern = new AnglePattern(patternList);
+    	SensorData anglePoint,f,s;
+    	Vector3d v1, v2;
+    	for (int i=0;i<patternList.size();i++) {
+    		f = SensorData.getDataForPosEnum(patternList.get(i++));
+    		anglePoint = SensorData.getDataForPosEnum(patternList.get(i++));
+    		s = SensorData.getDataForPosEnum(patternList.get(i));
+    		v1 = new Vector3d(anglePoint.getPos(),f.getPos());
+    		v2 = new Vector3d(anglePoint.getPos(),s.getPos());
+    		pattern.setPatternAt((i-2)%3, Vector3d.getAngleBetween(v1, v2));
     	}
     	return pattern;
     }
