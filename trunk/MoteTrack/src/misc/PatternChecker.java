@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.Observable;
 
 import data.AnglePattern;
+import java.util.NoSuchElementException;
 
 public class PatternChecker extends Observable implements Runnable {
 	private volatile boolean run=true;
@@ -44,15 +45,17 @@ public class PatternChecker extends Observable implements Runnable {
 		System.out.println("start checking "+this.patternName);
 		while (run) {
 			if (actPattern.size()>0) {
-				toCheck = actPattern.removeFirst();
-				for (int i=0;i<observePattern.length;i++) {
-					if (toCheck.match(observePattern[i])) {
-						this.setChanged();
-						this.notifyObservers(this.patternName);
-						System.out.println("pattern matched "+this.patternName);
-						break;
-					}
-				}
+				try {
+                                    toCheck = actPattern.removeFirst();
+                                    for (int i=0;i<observePattern.length;i++) {
+                                            if (toCheck.match(observePattern[i])) {
+                                                    this.setChanged();
+                                                    this.notifyObservers(this.patternName);
+                                                    System.out.println("pattern matched "+this.patternName);
+                                                    break;
+                                            }
+                                    }
+                                } catch (NoSuchElementException e) {}
 			}
 		}
 	}

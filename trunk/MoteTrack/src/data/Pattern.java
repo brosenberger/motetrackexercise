@@ -38,8 +38,19 @@ public class Pattern {
 		} 
 		return list;
 	}
+
+        public static final String[] standardPatternNames = {"linkerArmAusgestreckt",
+                                                            "rechterArmAusgestreckt",
+                                                            "linkerArm90",
+                                                            "rechterArm90",
+                                                            "linkerArmHuefte90",
+                                                            "linkerArmHuefte180",
+                                                            "rechterArmHuefte180",
+                                                            "rechterArmHuefte90",
+                                                            "linkerArmHuefte00",
+                                                            "rechterArmHuefte00"};
+
 	public static String[] getStandardPatternNames() {
-		String result[] = {"linkerArmAusgestreckt", "rechterArmAusgestreckt","linkerArm90","rechterArm90"};
-		return result;
+		return standardPatternNames;
 	}
 }
