@@ -555,19 +555,20 @@ public class MoteTrackApp extends JFrame {
     }//GEN-LAST:event_stopRecordButtonActionPerformed
 
     private void loadPatternMenuItemActionPerformed(ActionEvent evt) {//GEN-FIRST:event_loadPatternMenuItemActionPerformed
-        JFileChooser fc = new JFileChooser();
-        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-
-        String workdir = System.getProperty("user.dir");
-        fc.setSelectedFile(new File(workdir));
-
-        int value = fc.showOpenDialog(this);
-        if (value != JFileChooser.APPROVE_OPTION) {
-           return;
-        }
-        File file = fc.getSelectedFile();
-
-        patternPool.loadPattern(file.getAbsolutePath());
+//        JFileChooser fc = new JFileChooser();
+//        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+//
+//        String workdir = System.getProperty("user.dir");
+//        fc.setSelectedFile(new File(workdir));
+//
+//        int value = fc.showOpenDialog(this);
+//        if (value != JFileChooser.APPROVE_OPTION) {
+//           return;
+//        }
+//        File file = fc.getSelectedFile();
+//
+//        patternPool.loadPattern(file.getAbsolutePath());
+        patternPool.loadPattern();
     }//GEN-LAST:event_loadPatternMenuItemActionPerformed
 
     private void saveConfigMenuItemActionPerformed(ActionEvent evt) {//GEN-FIRST:event_saveConfigMenuItemActionPerformed
