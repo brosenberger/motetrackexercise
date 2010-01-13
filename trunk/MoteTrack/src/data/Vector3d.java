@@ -96,7 +96,7 @@ public class Vector3d {
     }
 
     public static double getAngleBetween(Vector3d v1, Vector3d v2) {
-        return (scalarMultiply(v1, v2)/(v1.getLength()*v2.getLength()));
+        return Math.acos(scalarMultiply(v1, v2)/(v1.getLength()*v2.getLength()));
     }
 
     public static double scalarMultiply(Vector3d v1, Vector3d v2) {

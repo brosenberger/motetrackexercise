@@ -24,7 +24,7 @@ public class SensorData extends Observable {
     private SensorData previousData;
     private SensorData followingData;
     private Vector3d direction;
-    private static ArrayList<PositionEnum> patternList;
+    private static ArrayList<PositionEnum> patternList = null;
 
     private static HashMap<String, PositionEnum> idToEnum = new HashMap<String, PositionEnum>();
     private static HashMap<PositionEnum, String> enumToId = new HashMap<PositionEnum, String>();
@@ -76,7 +76,9 @@ public class SensorData extends Observable {
         prevData.put(id, actData.put(id, this));
         //@Testausgabe
         //System.out.println(SensorData.getPattern());
-        dummyObs.setObjectChanged(SensorData.getPattern());
+        if (patternList != null) {
+            dummyObs.setObjectChanged(SensorData.getPattern());
+        }
     }
 
     public static Set<String> getActualTagIds() {
@@ -365,6 +367,7 @@ public class SensorData extends Observable {
     		v1 = new Vector3d(anglePoint.getPos(),f.getPos());
     		v2 = new Vector3d(anglePoint.getPos(),s.getPos());
     		pattern.setPatternAt((i-2)%3,Math.toDegrees(Vector3d.getAngleBetween(v1, v2)));
+                System.out.println(Math.toDegrees(Vector3d.getAngleBetween(v1, v2)));
     	}
     	return pattern;
     }
