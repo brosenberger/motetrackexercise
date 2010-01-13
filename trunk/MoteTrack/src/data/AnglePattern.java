@@ -43,7 +43,7 @@ public class AnglePattern implements Serializable {
 	}
 	
 	public boolean match(AnglePattern p) {
-		if (matchPattern(p.getPatternList(),this.patternList)) return false;
+		if (!matchPattern(p.getPatternList(),this.patternList)) return false;
 		double[] pattern2 = p.getPattern();
 		//if (pattern2.length!=pattern.length) return false;
 		for (int i=0;i<pattern.length;i++) {

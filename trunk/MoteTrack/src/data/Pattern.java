@@ -14,7 +14,7 @@ public class Pattern {
 		return listAnglePattern;
 	}
 	public static LinkedList<AnglePattern> getPattern(String name) {
-		LinkedList<AnglePattern> list=null;
+		LinkedList<AnglePattern> list=new LinkedList<AnglePattern>();
 		if (name.equalsIgnoreCase("linkerArmAusgestreckt")) {
 			list=generatePattern(PositionEnum.leftWrist,PositionEnum.leftShoulder,PositionEnum.rightShoulder, 180);
 		} else if (name.equalsIgnoreCase("rechterArmAusgestreckt")) {
@@ -27,7 +27,7 @@ public class Pattern {
 		return list;
 	}
 	public static String[] getStandardPatternNames() {
-		String result[] = {"linkderArmAusgestreckt", "rechterArmAusgestreckt","linkerArm90","rechterArm90"};
+		String result[] = {"linkerArmAusgestreckt", "rechterArmAusgestreckt","linkerArm90","rechterArm90"};
 		return result;
 	}
 }
