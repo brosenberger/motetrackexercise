@@ -7,7 +7,7 @@ import java.util.Iterator;
 public class AnglePattern implements Serializable {
 	private ArrayList<PositionEnum> patternList;
 	private double[] pattern;
-	private static double range=15;
+	private static double range=45;
 	
 	public AnglePattern(ArrayList<PositionEnum> patternList) {
 		this.patternList = patternList;

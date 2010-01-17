@@ -67,7 +67,7 @@ public class LoggerFrame extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         loggerTextPane = new javax.swing.JTextPane();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jComboBox1.setModel(comboBoxModel);
 
