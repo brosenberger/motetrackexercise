@@ -198,6 +198,10 @@ public class MoteTrackApp extends JFrame {
         jLabel2.setIcon(down);
     }
 
+    public void setPictureNOTHING() {
+        jLabel2.setIcon(nothing);
+    }
+
     public void setCounter(int count) {
         jLabel3.setText(""+count);
     }
@@ -330,8 +334,6 @@ public class MoteTrackApp extends JFrame {
                 stopRecordButtonActionPerformed(evt);
             }
         });
-
-        calibrationSpinner.setValue(5);
 
         jLabel3.setText("0");
         jLabel3.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -477,7 +479,7 @@ public class MoteTrackApp extends JFrame {
                         .addComponent(stopRecordButton)
                         .addPreferredGap(ComponentPlacement.UNRELATED)
                         .addComponent(calibrationSpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(ComponentPlacement.RELATED, 89, Short.MAX_VALUE)
+                        .addPreferredGap(ComponentPlacement.RELATED, 93, Short.MAX_VALUE)
                         .addComponent(maxVelocityLabel)
                         .addPreferredGap(ComponentPlacement.RELATED)
                         .addComponent(maxVelocitySpinner, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -740,7 +742,10 @@ public class MoteTrackApp extends JFrame {
 
         public void stateChanged(ChangeEvent e) {
             double val = (Double.parseDouble(calibrationSpinner.getValue().toString()))/10;
-            NormalizedServerDataReader.getInstance().setCalibrationData(new Position(val, val, val));
+            NormalizedServerDataReader nsdr = NormalizedServerDataReader.getInstance();
+            if (nsdr != null) {
+                nsdr.setCalibrationData(new Position(val, val, val));
+            }
         }
     };
 
@@ -880,6 +885,10 @@ public class MoteTrackApp extends JFrame {
         // ID TO ENUM MAPPING
         HashMap<String, PositionEnum> idsToEnum = conf.getIdEnumMatch();
         SensorData.setPosEnum(idsToEnum);
+    }
+
+    public void setCalibrationSpinnerValue(int value) {
+        calibrationSpinner.setValue(value);
     }
 
 }

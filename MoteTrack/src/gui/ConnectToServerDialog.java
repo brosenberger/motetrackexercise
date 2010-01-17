@@ -317,6 +317,7 @@ public class ConnectToServerDialog extends javax.swing.JDialog {
                 Position pos = normalizationPos;
                 NormalizedServerDataReader obs = new NormalizedServerDataReader(pos);
                 newClient.addObserver(obs);
+                parent.setCalibrationSpinnerValue(3);
             }
 
             if (maxVelocityCheckBox.isSelected()) {
